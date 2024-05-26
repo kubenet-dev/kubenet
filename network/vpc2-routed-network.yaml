@@ -1,0 +1,24 @@
+apiVersion: network.app.kuid.dev/v1alpha1
+kind: Network
+metadata:
+  name: topo3nodesrl.vpc2
+spec:
+  topology: topo3nodesrl
+  routingTables:
+  - name: rt20
+    networkID: 20
+    interfaces:
+    - endpoint: e1-1
+      node: edge01
+      region: region1
+      site: site1
+      addresses:
+      - address: 10.1.1.1/24
+    - endpoint: e1-1
+      node: edge02
+      region: region1
+      site: site1
+      addresses:
+      - address: 10.2.2.1/24
+  
+  

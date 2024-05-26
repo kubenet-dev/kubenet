@@ -1,0 +1,829 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+  name: nodemodels.srl.nokia.app.kuid.dev
+spec:
+  group: srl.nokia.app.kuid.dev
+  names:
+    kind: NodeModel
+    listKind: NodeModelList
+    plural: nodemodels
+    singular: nodemodel
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: NodeModel is the Schema for the srlinux node model API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              interfaces:
+                description: Interfaces defines the interfaces belonging to the node
+                  model
+                items:
+                  properties:
+                    name:
+                      type: string
+                    speed:
+                      type: string
+                    vlanTagging:
+                      type: boolean
+                  required:
+                  - speed
+                  type: object
+                type: array
+              parametersRef:
+                description: |-
+                  ParametersRef points to the vendor or implementation specific params for the
+                  node.
+                properties:
+                  apiVersion:
+                    description: API version of the referent.
+                    type: string
+                  fieldPath:
+                    description: |-
+                      If referring to a piece of an object instead of an entire object, this string
+                      should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                      For example, if the object reference is to a container within a pod, this would take on a value like:
+                      "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                      the event) or if no container name is specified "spec.containers[2]" (container with
+                      index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                      referencing a part of an object.
+                      TODO: this design is not final and this field is subject to change in the future.
+                    type: string
+                  kind:
+                    description: |-
+                      Kind of the referent.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+                    type: string
+                  name:
+                    description: |-
+                      Name of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  namespace:
+                    description: |-
+                      Namespace of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+                    type: string
+                  resourceVersion:
+                    description: |-
+                      Specific resourceVersion to which this reference is made, if any.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+                    type: string
+                  uid:
+                    description: |-
+                      UID of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              provider:
+                description: Provider specifies the provider implementing this node
+                  config.
+                type: string
+            required:
+            - interfaces
+            - provider
+            type: object
+        type: object
+    served: true
+    storage: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: kuid-nokia-srl
+  name: kuid-nokia-srl
+  namespace: kuid-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kuid-nokia-srl
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kuid-nokia-srl
+    spec:
+      containers:
+      - command:
+        - /app/nokia-srl
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: ENABLE_NODECONFIG
+          value: "true"
+        - name: ENABLE_DEVICECONFIG
+          value: "true"
+        image: ghcr.io/kuidio/nokia-srl:v0.0.4
+        imagePullPolicy: Always
+        name: kuid-nokia-srl
+        volumeMounts:
+        - mountPath: /app/templates
+          name: gotemplates-volume
+          readOnly: true
+      securityContext:
+        fsGroup: 10000
+        runAsGroup: 10000
+        runAsUser: 10000
+      serviceAccountName: kuid-nokia-srl
+      volumes:
+      - configMap:
+          name: gotemplates-srl
+        name: gotemplates-volume
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: kuid-nokia-srl
+  name: kuid-nokia-srl-clusterrole
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - configmaps
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - srl.nokia.app.kuid.dev
+  resources:
+  - nodemodels
+  - nodemodels/status
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - infra.be.kuid.dev
+  resources:
+  - nodes
+  - nodes/status
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - infra.be.kuid.dev
+  resources:
+  - endpoints
+  - endpoints/status
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - infra.be.kuid.dev
+  resources:
+  - modules
+  - modules/status
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - infra.be.kuid.dev
+  resources:
+  - modulebays
+  - modulebays/status
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - infra.be.kuid.dev
+  resources:
+  - nodeitems
+  - nodeitems/status
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - network.app.kuid.dev
+  resources:
+  - networks
+  verbs:
+  - get
+  - watch
+  - list
+  - update
+  - patch
+- apiGroups:
+  - network.app.kuid.dev
+  resources:
+  - networks/status
+  verbs:
+  - get
+  - watch
+  - list
+  - update
+  - patch
+- apiGroups:
+  - network.app.kuid.dev
+  resources:
+  - networkdevices
+  - networkdevices/status
+  verbs:
+  - get
+  - watch
+  - list
+  - update
+  - patch
+- apiGroups:
+  - config.sdcio.dev
+  resources:
+  - configs
+  - configs/status
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: kuid-nokia-srl
+  name: kuid-nokia-srl-clusterrole-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kuid-nokia-srl-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: kuid-nokia-srl
+  namespace: kuid-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/name: kuid-nokia-srl
+  name: kuid-nokia-srl-leader-election-role
+  namespace: kuid-system
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - watch
+  - list
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: kuid-nokia-srl
+  name: kuid-nokia-srl-leader-election-role-binding
+  namespace: kuid-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kuid-nokia-srl-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: kuid-nokia-srl
+  namespace: kuid-system
+---
+apiVersion: v1
+data:
+  main.tmpl: |-
+    {
+      {{- if .System }}
+      "system": {
+        {{- template "srlsystem" .System}}
+      },
+      {{- end }}
+      {{- if ne 0 (len .Interfaces)}}
+      "interface": [
+      {{- range $index, $interface := .Interfaces}}
+        {{- if $index}},{{- end}}
+        {
+          {{- template "srlinterface" .}}
+        }
+      {{- end}}
+      ]{{if ne 0 (len $.NetworkInstances)}},{{end}}
+      {{- end}}
+      {{- if ne 0 (len $.NetworkInstances)}}
+      "network-instance": [
+      {{- range $index, $ni := .NetworkInstances}}
+        {{- if $index}},{{- end}}
+        {
+          {{- template "srlnetworkinstance" .}}
+        }
+      {{- end}}
+      ]{{if or (ne 0 (len $.RoutingPolicies)) (ne 0 (len $.TunnelInterfaces)) }},{{end}}
+      {{- end}}
+      {{- if ne 0 (len $.RoutingPolicies)}}
+      "routing-policy": {
+          {{- template "srlroutingpolicy" .}}
+      },
+      {{- end}}
+      {{- if ne 0 (len $.TunnelInterfaces)}}
+      "tunnel-interface": [
+      {{- range $index, $interface := .TunnelInterfaces}}
+        {{- if $index}},{{- end}}
+        {
+          {{- template "srltunnelinterface" .}}
+        }
+      {{- end}}
+      ]
+      {{- end}}
+    }
+  srl_interface.tmpl: |-
+    {{define "srlinterface"}}
+          "name": "{{ (ifName .Name ) }}",
+          "description": "k8s-{{(ifName .Name )}}",
+          "admin-state": "enable",
+          {{- if .VLANTagging}}
+            "vlan-tagging": {{.VLANTagging}},
+          {{- end}}
+          "ethernet": {
+            {{- if and (ne .Speed "") (ne (isBreakoutPort .Name) true)}}
+            "port-speed": "{{.Speed}}"{{- if eq .LAGMember true }},{{- end}}
+            {{- end}}
+            {{- if eq .LAGMember true }}
+              "aggregate-id": "{{.LAGMember}}"
+            {{- end}}
+          }{{if ne 0 (len $.SubInterfaces)}},{{end}}
+          {{- if ne 0 (len $.SubInterfaces)}}
+          "subinterface": [
+          {{- range $index, $subinterface := .SubInterfaces}}
+            {
+              {{- template "srlinterfacesubinterface" .}}
+            }{{if lt $index (dec (len $.SubInterfaces))}},{{end}}
+          {{- end}}
+          ]
+          {{- end}}
+    {{- end}}
+  srl_interface_subinterface.tmpl: |-
+    {{define "srlinterfacesubinterface"}}
+              "index": {{.ID}},
+        {{- if .Type}}
+              "type": "{{.Type}}",
+        {{- end}}
+              "admin-state": "enable",
+              "description": "k8s-{{.PeerName}}",
+        {{- if .VLAN}}
+              "vlan": {
+                {{- template "srlinterfacesubinterfacevlan" .VLAN}}
+              }{{- if or (.IPv4) (.IPv6) }},{{- end}}
+        {{- end}}
+        {{- if eq .Type "routed" ""}}
+        {{- if .IPv4 }}
+              "ipv4":{
+                "admin-state": "enable",
+                {{- if ne 0 (len .IPv4.Addresses)}}
+                "address": [
+                {{- range $index, $address := .IPv4.Addresses}}
+                  {
+                    "ip-prefix": "{{ $address }}"
+                  }{{if lt $index (dec (len $.IPv4.Addresses))}},{{end}}
+                {{- end}}
+                ],
+                "unnumbered": {
+                  "admin-state": "disable"
+                }
+                {{- end}}
+              }{{if .IPv6}},{{end}}
+        {{- end}}
+        {{- if .IPv6 }}
+              "ipv6":{
+                "admin-state": "enable",
+                {{- if ne 0 (len .IPv6.Addresses)}}
+                "address": [
+                {{- range $index, $address := .IPv6.Addresses}}
+                  {
+                    "ip-prefix": "{{ $address }}"
+                  }{{if lt $index (dec (len $.IPv6.Addresses))}},{{end}}
+                {{- end}}
+                ]
+                {{- end}}
+              }
+        {{- end}}
+        {{- end}}
+    {{- end}}
+  srl_interface_subinterface_vlan.tmpl: |-
+    {{define "srlinterfacesubinterfacevlan"}}
+                "encap": {
+        {{- if eq (derefUint32 .) 0 }}
+                  "untagged": {}
+        {{- else}}
+                  "single-tagged": {
+                    "vlan-id": {{ (derefUint32 .) }}
+                  }
+                }
+        {{- end}}
+    {{- end}}
+  srl_networkinstance.tmpl: |-
+    {{define "srlnetworkinstance"}}
+          "name": "{{.Name}}",
+          "description": "k8s-{{.Name}}",
+          "admin-state": "enable",
+          "type": "{{ .Type }}",
+      {{- if ne 0 (len .Interfaces)}}
+          "interface": [
+        {{- range $index, $interface := .Interfaces}}
+            {{- if $index}},{{- end}}
+            {
+              "name": "{{ (ifName $interface.Name) }}.{{ $interface.ID}}"
+            }
+        {{- end}}
+          ]{{- if .Protocols}},{{ end }}
+      {{- end }}
+      {{- if .VXLANInterface }}
+          "vxlan-interface": [
+            {
+              "name": "{{ (ifName .VXLANInterface.Name) }}.{{ .VXLANInterface.ID }}"
+            }
+          ],
+      {{- end }}
+      {{- if .Protocols }}
+          "protocols": {
+        {{- if .Protocols.BGP }}
+            "bgp": {
+              {{- template "srlnetworkinstancebgp" $.Protocols.BGP}}
+            }{{- if .Protocols.BGPVPN }},{{end}}
+        {{- end }}
+        {{- if .Protocols.BGPVPN }}
+            "bgp-vpn": {
+              {{- template "srlnetworkinstancebgpvpn" $.Protocols.BGPVPN}}
+            }{{- if .Protocols.BGPEVPN }},{{end}}
+        {{- end }}
+        {{- if .Protocols.BGPEVPN }}
+            "bgp-evpn": {
+              {{- template "srlnetworkinstancebgpevpn" $.Protocols.BGPEVPN}}
+            }
+        {{- end }}
+          }
+      {{- end }}
+    {{- end}}
+  srl_networkinstance_bgp.tmpl: |2-
+      {{define "srlnetworkinstancebgp"}}
+              "admin-state": "enable",
+              "autonomous-system": {{.AS}},
+              "router-id": "{{.RouterID}}",
+            {{- if .DynamicNeighbors }}
+              "dynamic-neighbors": {
+                "accept": {
+                  "match": [
+                {{- range $index, $prefix := .DynamicNeighbors.PeerPrefixes }}
+                  {{- if $index}},{{- end}}
+                    {
+                      "prefix": "{{ $prefix }}",
+                      "peer-group": "{{$.DynamicNeighbors.PeerGroup}}",
+                      "allowed-peer-as": [
+                        "{{$.DynamicNeighbors.PeerAS}}"
+                      ]
+                    }
+                {{- end }}
+                  ]
+                }
+              },
+            {{- end}}
+              "preference": {
+                  "ebgp": 100,
+                  "ibgp": 170
+              },
+              "ebgp-default-policy": {
+                "import-reject-all": false,
+                "export-reject-all": false
+                },
+            {{- range $index, $element := .PeerGroups}}
+            {{- if eq "underlay" $element.Name }}
+              "afi-safi": [
+            {{- range $index, $af := $element.AddressFamilies}}
+                {
+                  "afi-safi-name": "{{ $af }}",
+                  "admin-state": "enable"{{- if or (eq $af "ipv4-unicast") (eq $af "ipv6-unicast")}},{{- end }}
+              {{- if or (eq $af "ipv4-unicast") (eq $af "ipv6-unicast")}}
+                  "multipath": {
+                    "allow-multiple-as": true,
+                    "max-paths-level-1": 64,
+                    "max-paths-level-2": 64
+                  }
+              {{- end }}
+                }{{- if lt $index (dec (len $element.AddressFamilies))}},{{end}}
+              {{- end }}
+              ],
+            {{- end }}
+            {{- end }}
+              "group": [
+            {{- range $index, $element := .PeerGroups}}
+               {{- if $index}},{{- end}}
+                {
+                  {{- template "srlnetworkinstancebgppeergroup" .}}
+                }
+            {{- end }}
+              ],
+              "neighbor":[
+            {{- range $index, $element := .Neighbors}}
+              {{- if $index}},{{- end}}
+                {
+                  {{- template "srlnetworkinstancebgpneighbor" .}}
+                }
+          {{- end}}
+              ]
+    {{- end}}
+  srl_networkinstance_bgp_neighbor.tmpl: |2-
+      {{define "srlnetworkinstancebgpneighbor"}}
+            {{- if ne .LocalAS 0}}
+                  "local-as": {
+                    "as-number": "{{.LocalAS}}", "prepend-global-as": false
+                  },
+            {{- end}}
+                  "peer-address": "{{.PeerAddress}}",
+                  "peer-as": {{.PeerAS}},
+                  "peer-group": "{{.PeerGroup}}"{{- if ne .LocalAddress ""}},{{end}}
+            {{- if ne .LocalAddress ""}}
+                  "transport":{
+                    "local-address": "{{.LocalAddress}}"
+                  }
+            {{- end}}
+    {{- end}}
+  srl_networkinstance_bgp_peergroup.tmpl: |2-
+      {{define "srlnetworkinstancebgppeergroup"}}
+                  "group-name": "{{.Name}}",
+                  "export-policy": "{{.Name}}",
+                  "admin-state": "enable",
+                  "next-hop-self": true,
+                  "afi-safi": [
+                  {{- range $index, $af := .AddressFamilies}}
+                    {{- if $index}},{{- end}}
+                    {
+                      "afi-safi-name": "{{ $af }}",
+                      "admin-state": "enable"
+                    }
+                  {{- end }}
+                  ]{{- if .RouteReflector }},{{- end }}
+                  {{- if .RouteReflector }}
+                  "route-reflector": {
+                    "client": true,
+                    "cluster-id": "{{ .RouteReflector.ClusterID }}"
+                  }
+                  {{- end }}
+    {{- end}}
+  srl_networkinstance_bgpevpn.tmpl: |-
+    {{define "srlnetworkinstancebgpevpn"}}
+              "bgp-instance": [
+                {
+                  "id": 1,
+                  "admin-state": "enable",
+                  "vxlan-interface": "{{ (ifName .VXLANInterface) }}.{{ $.EVI}}",
+                  "evi": {{.EVI}},
+                  "encapsulation-type": "vxlan"
+                }
+              ]
+    {{- end}}
+  srl_networkinstance_bgpvpn.tmpl: |-
+    {{define "srlnetworkinstancebgpvpn"}}
+              "bgp-instance": [
+                {
+                  "id": 1,
+                  "route-target": {
+                    "export-rt": "{{.ExportRouteTarget}}",
+                    "import-rt": "{{.ImportRouteTarget}}"
+                  }
+                }
+              ]
+    {{- end}}
+  srl_routingpolicy.tmpl: |-
+    {{define "srlroutingpolicy"}}
+    {{- if ne 0 (len $.RoutingPolicies)}}
+        "prefix-set": [
+        {{- range $index, $rp := .RoutingPolicies}}
+          {
+            "name": "{{$rp.Name}}-ipv4",
+            "prefix": [
+            {{- range $index, $ipv4 := $rp.IPv4Prefixes}}
+              {
+                "ip-prefix": "{{$ipv4}}",
+                "mask-length-range": "32..32"
+              }{{if lt $index (dec (len $rp.IPv4Prefixes))}},{{end}}
+            {{- end}}
+            ]
+          },
+          {
+            "name": "{{$rp.Name}}-ipv6",
+            "prefix": [
+            {{- range $index, $ipv6 := $rp.IPv6Prefixes}}
+              {
+                "ip-prefix": "{{$ipv6}}",
+                "mask-length-range": "128..128"
+              }{{if lt $index (dec (len $rp.IPv6Prefixes))}},{{end}}
+            {{- end}}
+            ]
+          }{{if lt $index (dec (len $.RoutingPolicies))}},{{end}}
+        {{- end}}
+        ],
+        "policy": [
+        {{- range $index, $rp := .RoutingPolicies}}
+          {
+            "name": "{{.Name}}",
+            "statement": [
+             {{- if ne 0 (len $rp.IPv4Prefixes)}}
+              {
+                "name": "10",
+                "match": {
+                  "prefix-set": "underlay-ipv4"
+                },
+                "action": {
+                  "policy-result": "accept"
+                }
+              }{{- if ne 0 (len $rp.IPv6Prefixes)}},{{end}}
+            {{- end}}
+            {{- if ne 0 (len $rp.IPv6Prefixes)}}
+              {
+                "name": "20",
+                "match": {
+                  "prefix-set": "underlay-ipv6"
+                },
+                "action": {
+                  "policy-result": "accept"
+                }
+              }
+            {{- end}}
+            ]
+          }{{if lt $index (dec (len $.RoutingPolicies))}},{{end}}
+        {{- end}}
+        ]
+    {{- end}}
+    {{- end}}
+  srl_system.tmpl: |-
+    {{define "srlsystem"}}
+      {{- if .Protocols }}
+        "network-instance": {
+          "protocols": {
+          {{- if .Protocols.BGPVPN }}
+            "bgp-vpn": {
+            {{- template "srlsystemprotocolsbgpvpn" .Protocols.BGPVPN}}
+            }{{- if .Protocols.BGPEVPN }},{{ end }}
+          {{- end }}
+          {{- if .Protocols.BGPEVPN }}
+            "evpn": {
+            {{- template "srlsystemprotocolsbgpevpn" .Protocols.BGPEVPN}}
+            }
+          {{- end }}
+          }
+        }
+      {{- end }}
+    {{- end }}
+  srl_system_protocols_bgpevpn.tmpl: |-
+    {{define "srlsystemprotocolsbgpevpn"}}
+    {{- end }}
+  srl_system_protocols_bgpvpn.tmpl: |-
+    {{define "srlsystemprotocolsbgpvpn"}}
+              "bgp-instance": [
+                {
+                  "id": 1
+                }
+              ]
+    {{- end }}
+  srl_tunnel_interface.tmpl: |-
+    {{define "srltunnelinterface"}}
+          "name": "{{ (ifName .Name ) }}"{{- if ne 0 (len $.SubInterfaces)}},{{end}}
+          {{- if ne 0 (len $.SubInterfaces)}}
+          "vxlan-interface": [
+          {{- range $index, $subinterface := .SubInterfaces}}
+            {
+              {{- template "srltunnelsubinterface" .}}
+            }{{if lt $index (dec (len $.SubInterfaces))}},{{end}}
+          {{- end}}
+          ]
+          {{- end}}
+    {{- end}}
+  srl_tunnel_subinterfaces.tmpl: |-
+    {{define "srltunnelsubinterface"}}
+              "index": {{.ID}},
+              "type": "{{.Type}}",
+              "ingress": {
+                "vni": {{.ID}}
+              }
+    {{- end}}
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: gotemplates-srl
+  namespace: kuid-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/name: kuid-nokia-srl
+  name: kuid-nokia-srl
+  namespace: kuid-system

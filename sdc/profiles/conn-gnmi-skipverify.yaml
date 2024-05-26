@@ -1,0 +1,11 @@
+apiVersion: inv.sdcio.dev/v1alpha1
+kind: TargetConnectionProfile
+metadata:
+  name: conn-gnmi-skipverify
+  namespace: default
+spec:
+  port: 57400
+  protocol: gnmi
+  encoding: ASCII
+  skipVerify: true
+  insecure: false

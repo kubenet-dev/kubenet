@@ -1,0 +1,36 @@
+apiVersion: network.app.kuid.dev/v1alpha1
+kind: NetworkConfig
+metadata:
+  name: topo3nodesrl.default
+spec:
+  topology: topo3nodesrl
+  addressing: dualstack
+  prefixes:
+  - prefix: 10.0.0.0/16
+    labels:
+      ipam.be.kuid.dev/ipprefix-type: pool # could be derived from purpose
+      infra.be.kuid.dev/purpose: loopback
+  - prefix: 1000::/64
+    labels:
+      ipam.be.kuid.dev/ipprefix-type: pool # could be derived from purpose
+      infra.be.kuid.dev/purpose: loopback
+  - prefix: 192.0.0.0/16
+    labels:
+      ipam.be.kuid.dev/ipprefix-type: network # could be derived from purpose
+      infra.be.kuid.dev/purpose: link-internal
+  - prefix: 1192::/56
+    labels:
+      ipam.be.kuid.dev/ipprefix-type: network # could be derived from purpose
+      infra.be.kuid.dev/purpose: link-internal
+  protocols:
+    ibgp:
+      as: 65535
+      localAS: true
+      routeReflectors:
+      - topo3nodesrl.default.core01.ipv4
+    ebgp: 
+      asPool: 65000-65100
+    bgpEVPN: {}
+  encapsulation: 
+    vxlan: {}
+  

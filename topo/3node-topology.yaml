@@ -1,0 +1,59 @@
+apiVersion: topo.app.kuid.dev/v1alpha1
+kind: Topology
+metadata:
+  name: topo3nodesrl
+spec:
+  region: region1
+  site: site1
+  containerLab: |-
+    name: topo3nodesrl
+
+    mgmt:
+      mtu: 1500
+      #network: kind
+      network: kubenet  
+      ipv4-subnet: 172.21.0.0/16
+
+    topology:
+      kinds:
+        nokia_srlinux:
+          image: ghcr.io/nokia/srlinux
+        linux:
+          image: ghcr.io/hellt/network-multitool
+      nodes:
+        edge01:
+          kind: nokia_srlinux
+          type: ixrd2
+          labels:
+            network.infra.be.kuid.dev/device-type: edge ## can also be pe
+        edge02:
+          kind: nokia_srlinux
+          type: ixrd2
+          labels:
+            network.infra.be.kuid.dev/device-type: edge ## can also be pe
+        core01:
+          kind: nokia_srlinux
+          type: ixrd3
+          labels:
+            network.infra.be.kuid.dev/device-type: core ## can also be p
+        client1:
+          kind: linux
+          labels: 
+            infra.be.kuid.dev/exclude: "true"
+        client2:
+          kind: linux
+          labels: 
+            infra.be.kuid.dev/exclude: "true"
+      links:
+        - endpoints: ["edge01:e1-49", "core01:e1-1"]
+          labels: 
+            infra.be.kuid.dev/link-type: infra
+        - endpoints: ["edge02:e1-49", "core01:e1-2"]
+          labels: 
+            infra.be.kuid.dev/link-type: infra
+        - endpoints: ["client1:eth1", "edge01:e1-1"]
+          labels: 
+            infra.be.kuid.dev/exclude: "true"
+        - endpoints: ["client2:eth1", "edge02:e1-1"]
+          labels: 
+            infra.be.kuid.dev/exclude: "true"

@@ -1,0 +1,23 @@
+apiVersion: inv.sdcio.dev/v1alpha1
+kind: Schema
+metadata:
+  name: srl.nokia.sdcio.dev-24.3.2
+  namespace: default
+spec:
+  repoURL: https://github.com/sdcio/yang
+  provider: srl.nokia.sdcio.dev
+  version: 24.3.2
+  kind: branch
+  ref: v24.3.2
+  dirs:
+  - src: .
+    dst: .
+  schema:
+    models:
+    - srl_nokia/models
+    includes:
+    - ietf
+    - openconfig/extensions
+    - openconfig/openconfig-extensions.yang
+    excludes:
+    - .*tools.*

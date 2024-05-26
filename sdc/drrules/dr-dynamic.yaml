@@ -1,0 +1,26 @@
+apiVersion: inv.sdcio.dev/v1alpha1
+kind: DiscoveryRule
+metadata:
+  name: dr-dynamic
+  namespace: default
+spec:
+  period: 1m
+  concurrentScans: 2
+  prefixes:
+  - prefix: 172.21.0.0/28
+    excludes:
+    - 172.21.0.0
+    - 172.21.0.1
+    - 172.21.0.15
+  discoveryProfile:
+    credentials: srl.nokia.sdcio.dev 
+    connectionProfiles:
+    - conn-gnmi-skipverify
+  targetConnectionProfiles:
+  - credentials: srl.nokia.sdcio.dev 
+    connectionProfile: conn-gnmi-skipverify
+    syncProfile: sync-gnmi-get
+  targetTemplate:
+    labels:
+      sdcio.dev/region: us-east
+    

@@ -1,0 +1,38 @@
+apiVersion: network.app.kuid.dev/v1alpha1
+kind: Network
+metadata:
+  name: topo3nodesrl.vpc3
+spec:
+  topology: topo3nodesrl
+  bridgeDomains:
+  - name: br30
+    networkID: 30
+    interfaces:
+    - endpoint: e1-1
+      node: edge01
+      region: region1
+      site: site1
+    - endpoint: e1-1
+      node: edge02
+      region: region1
+      site: site1
+  routingTables:
+  - name: rt35
+    networkID: 35
+    interfaces:
+    - bridgeDomain: br30
+      node: edge01
+      region: region1
+      site: site1
+      addresses:
+        - address: 10.0.1.1/24
+    - bridgeDomain: br30
+      node: edge02
+      region: region1
+      site: site1
+      addresses:
+        - address: 10.0.2.1/24
+
+
+  
+  

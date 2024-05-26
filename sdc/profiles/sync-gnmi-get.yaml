@@ -1,0 +1,16 @@
+apiVersion: inv.sdcio.dev/v1alpha1
+kind: TargetSyncProfile
+metadata:
+  name: sync-gnmi-get
+  namespace: default
+spec:
+  buffer: 0
+  workers: 10
+  validate: true
+  sync:
+  - name: config
+    protocol: gnmi
+    paths:
+    - /
+    mode: get
+    interval: 30s
