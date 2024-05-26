@@ -5,13 +5,13 @@ metadata:
   namespace: default
 spec:
   upstream:
-    repository: kubenet-examples
+    repository: repo-catalog
     realm: network
     package: bridge
     revision: v1
   downstream:
     target: topo3nodesrl
-    repository: kubenet-target
+    repository: repo-target
     realm: network
     package: bridge
   packageContext:
