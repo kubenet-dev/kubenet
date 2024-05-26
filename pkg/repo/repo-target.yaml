@@ -1,0 +1,10 @@
+apiVersion: config.pkg.pkgserver.dev/v1alpha1
+kind: Repository
+metadata:
+  name: repo-target
+spec:
+  type: git
+  deployment: true
+  git:
+    url: https://github.com/pkgserver-dev/pkgserver-demo-target.git
+    credentials: git-pat

@@ -1,0 +1,9 @@
+apiVersion: config.pkg.pkgserver.dev/v1alpha1
+kind: Repository
+metadata:
+  name: repo-catalog
+spec:
+  type: git
+  deployment: false
+  git:
+    url: https://github.com/pkgserver-dev/pkgserver-demo-catalog.git

@@ -1,0 +1,19 @@
+apiVersion: config.pkg.pkgserver.dev/v1alpha1
+kind: PackageVariant
+metadata:
+  name: pv-network-bridge
+  namespace: default
+spec:
+  upstream:
+    repository: kubenet-examples
+    realm: network
+    package: bridge
+    revision: v1
+  downstream:
+    target: topo3nodesrl
+    repository: kubenet-target
+    realm: network
+    package: bridge
+  packageContext:
+    readinessGates:
+    - conditionType: pkg.pkgserver.dev/network
