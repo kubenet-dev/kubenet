@@ -6,5 +6,5 @@ spec:
   type: git
   deployment: true
   git:
-    url: https://github.com/pkgserver-dev/pkgserver-demo-target.git
+    url: https://github.com/kubenet-dev/demo.git
     credentials: git-pat
