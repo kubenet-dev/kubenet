@@ -1700,8 +1700,8 @@ rules:
 - apiGroups:
   - network.app.kuid.dev
   resources:
-  - networkconfigs
-  - networkconfigs/status
+  - networkdesigns
+  - networkdesigns/status
   verbs:
   - get
   - watch
