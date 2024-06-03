@@ -156,7 +156,7 @@ spec:
           value: "true"
         - name: ENABLE_DEVICECONFIG
           value: "true"
-        image: ghcr.io/kuidio/nokia-srl:v0.0.5
+        image: ghcr.io/kuidio/nokia-srl:v0.0.6
         imagePullPolicy: Always
         name: kuid-nokia-srl
         volumeMounts:
@@ -504,6 +504,11 @@ data:
         {{- if .IPv6 }}
               "ipv6":{
                 "admin-state": "enable",
+                "router-advertisement": {
+                  "router-role": {
+                    "admin-state": "enable"
+                  }
+                }{{- if ne 0 (len .IPv6.Addresses)}},{{end}}
                 {{- if ne 0 (len .IPv6.Addresses)}}
                 "address": [
                 {{- range $index, $address := .IPv6.Addresses}}
@@ -554,6 +559,16 @@ data:
       {{- end }}
       {{- if .Protocols }}
           "protocols": {
+        {{- if .Protocols.ISIS }}
+            "isis": {
+              {{- template "srlnetworkinstanceisis" $.Protocols.ISIS}}
+            }{{- if .Protocols.ISIS }},{{end}}
+        {{- end }}
+        {{- if .Protocols.OSPF }}
+            "ospf": {
+              {{- template "srlnetworkinstanceospf" $.Protocols.OSPF}}
+            }{{- if .Protocols.OSPF }},{{end}}
+        {{- end }}
         {{- if .Protocols.BGP }}
             "bgp": {
               {{- template "srlnetworkinstancebgp" $.Protocols.BGP}}
@@ -581,18 +596,26 @@ data:
               "dynamic-neighbors": {
                 "accept": {
                   "match": [
-                {{- range $index, $prefix := .DynamicNeighbors.PeerPrefixes }}
+               {{- range $index, $prefix := .DynamicNeighbors.Prefixes }}
                   {{- if $index}},{{- end}}
                     {
                       "prefix": "{{ $prefix }}",
-                      "peer-group": "{{$.DynamicNeighbors.PeerGroup}}",
+                      "peer-group": "{{ $.DynamicNeighbors.PeerGroup }}",
                       "allowed-peer-as": [
                         "{{$.DynamicNeighbors.PeerAS}}"
                       ]
                     }
-                {{- end }}
+               {{- end }}
                   ]
-                }
+                },
+                "interface": [
+              {{- range $index, $element := .DynamicNeighbors.Interfaces }}
+                  {{- if $index}},{{- end}}
+                  {
+                    {{- template "srlnetworkinstancebgpneighbordynamic" .}}
+                  }
+              {{- end}}
+                ]
               },
             {{- end}}
               "preference": {
@@ -636,7 +659,7 @@ data:
                 {
                   {{- template "srlnetworkinstancebgpneighbor" .}}
                 }
-          {{- end}}
+            {{- end}}
               ]
     {{- end}}
   srl_networkinstance_bgp_neighbor.tmpl: |2-
@@ -654,6 +677,14 @@ data:
                     "local-address": "{{.LocalAddress}}"
                   }
             {{- end}}
+    {{- end}}
+  srl_networkinstance_bgp_neighbor_dynamic.tmpl: |-
+    {{define "srlnetworkinstancebgpneighbordynamic"}}
+                  "interface-name": "{{ (ifName .SubInterfaceName.Name) }}.{{ .SubInterfaceName.ID}}",
+                  "peer-group": "{{ .PeerGroup }}",
+                  "allowed-peer-as": [
+                      "{{ .PeerAS }}"
+                  ]
     {{- end}}
   srl_networkinstance_bgp_peergroup.tmpl: |2-
       {{define "srlnetworkinstancebgppeergroup"}}
@@ -700,6 +731,130 @@ data:
                   }
                 }
               ]
+    {{- end}}
+  srl_networkinstance_isis.tmpl: |-
+    {{define "srlnetworkinstanceisis"}}
+          {{- if ne 0 (len .Instances)}}
+              "instance": [
+            {{- range $index, $instance := .Instances}}
+                {{- if $index}},{{- end}}
+                {
+                  {{- template "srlnetworkinstanceisisinstance" $instance}}
+                }
+            {{- end}}
+              ]
+          {{- end }}
+    {{- end}}
+  srl_networkinstance_isis_instance.tmpl: |-
+    {{define "srlnetworkinstanceisisinstance"}}
+                  "name": "{{ .Name }}",
+                  "admin-state": "enable",
+                  "level-capability": "{{ .LevelCapability }}",
+            {{- if ne 0 (len .Net)}}
+                  "net": [
+              {{- range $index, $net := .Net}}
+                    {{- if $index}},{{- end}}
+                    "{{ $net }}"
+              {{- end}}
+                  ],
+            {{- end }}
+            {{- range $index, $af := .AddressFamilies}}
+                  {{- if $index}},{{- end}}
+               {{- if eq $af "ipv4-unicast" }}
+                  "ipv4-unicast": {
+                    "admin-state": "enable"
+                  }
+               {{- end}}
+               {{- if eq $af "ipv6-unicast" }}
+                  "ipv6-unicast": {
+                    "admin-state": "enable"
+                  }
+               {{- end}}
+            {{- end }}
+            {{- if ne 0 (len .Interfaces)}}
+                  ,
+                  "interfaces": [
+            {{- range $index, $itfce := .Interfaces}}
+                    {{- if $index}},{{- end}}
+                    {
+                      {{- template "srlnetworkinstanceisisinstanceinterface" $itfce}}
+                    }
+            {{- end}}
+                  ]
+          {{- end }}
+    {{- end}}
+  srl_networkinstance_isis_instance_interface.tmpl: |-
+    {{define "srlnetworkinstanceisisinstanceinterface"}}
+                      "name": "{{ (ifName .SubInterfaceName.Name) }}.{{ .SubInterfaceName.ID}}",
+                      "admin-state": "enable",
+                {{- if .Passive }}
+                      "passive": {{.Passive}},
+                {{- else }}
+                      "circuit-type": "{{ .Type }}",
+                {{- end }}
+                      "level": [
+                        {
+                          "level-number": {{.Level}}
+                        }
+                      ]
+    {{- end}}
+  srl_networkinstance_ospf.tmpl: |-
+    {{define "srlnetworkinstanceospf"}}
+          {{- if ne 0 (len .Instances)}}
+              "instance": [
+            {{- range $index, $instance := .Instances}}
+                {{- if $index}},{{- end}}
+                {
+                  {{- template "srlnetworkinstanceospfinstance" $instance}}
+                }
+            {{- end}}
+              ]
+          {{- end }}
+    {{- end}}
+  srl_networkinstance_ospf_instance.tmpl: |-
+    {{define "srlnetworkinstanceospfinstance"}}
+                  "name": "{{ .Name }}",
+                  "admin-state": "enable",
+            {{- if eq .Version "v2" }}
+                  "version": "ospf-v2",
+            {{- else }}
+                  "version": "ospf-v3",
+            {{- end }}
+                  "router-id": "{{ .RouterID }}",
+            {{- if ne 0 (len .Areas)}}
+                  "area": [
+              {{- range $index, $area := .Areas}}
+                    {{- if $index}},{{- end}}
+                    {
+                      {{- template "srlnetworkinstanceospfinstancearea" $area}}
+                    }
+              {{- end}}
+                  ]
+            {{- end }}
+    {{- end}}
+  srl_networkinstance_ospf_instance_area.tmpl: |-
+    {{define "srlnetworkinstanceospfinstancearea"}}
+                      "area-id": "{{ .Name }}",
+                {{- if ne 0 (len .Interfaces)}}
+                      "interface": [
+                  {{- range $index, $itfce := .Interfaces}}
+                        {{- if $index}},{{- end}}
+                        {
+                          {{- template "srlnetworkinstanceospfinstanceareainterface" $itfce}}
+                        }
+                  {{- end}}
+                      ]
+                {{- end }}
+    {{- end}}
+  srl_networkinstance_ospf_instance_area_interface.tmpl: |-
+    {{define "srlnetworkinstanceospfinstanceareainterface"}}
+                          "interface-name": "{{ (ifName .SubInterfaceName.Name) }}.{{ .SubInterfaceName.ID}}",
+                          "admin-state": "enable",
+                {{- if .Passive }}
+                          "passive": {{.Passive}}
+                {{- else }}
+                          "interface-type": "{{ .Type }}"
+                {{- end }}
     {{- end}}
   srl_routingpolicy.tmpl: |-
     {{define "srlroutingpolicy"}}

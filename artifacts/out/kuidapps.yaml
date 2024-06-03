@@ -375,8 +375,6 @@ spec:
                                 items:
                                   type: string
                                 type: array
-                            required:
-                            - addresses
                             type: object
                           ipv6:
                             properties:
@@ -384,8 +382,6 @@ spec:
                                 items:
                                   type: string
                                 type: array
-                            required:
-                            - addresses
                             type: object
                           peerName:
                             type: string
@@ -442,17 +438,28 @@ spec:
                                 interfaces:
                                   items:
                                     properties:
-                                      name:
-                                        type: string
                                       peerAS:
                                         format: int32
                                         type: integer
                                       peerGroup:
                                         type: string
+                                      subInterfaceName:
+                                        description: SubInterfaceName defines the
+                                          name and id of the sub interface
+                                        properties:
+                                          id:
+                                            format: int32
+                                            type: integer
+                                          name:
+                                            type: string
+                                        required:
+                                        - id
+                                        - name
+                                        type: object
                                     required:
-                                    - name
                                     - peerAS
                                     - peerGroup
+                                    - subInterfaceName
                                     type: object
                                   type: array
                                 prefixes:
@@ -1526,7 +1533,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.8
+        image: ghcr.io/kuidio/kuidapps:v0.0.9
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
