@@ -3,17 +3,17 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.15.0
-  name: networkconfigs.network.app.kuid.dev
+  name: networkdesigns.network.app.kuid.dev
 spec:
   group: network.app.kuid.dev
   names:
     categories:
     - kuid
     - net
-    kind: NetworkConfig
-    listKind: NetworkConfigList
-    plural: networkconfigs
-    singular: networkconfig
+    kind: NetworkDesign
+    listKind: NetworkDesignList
+    plural: networkdesigns
+    singular: networkdesign
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -23,7 +23,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: NetworkConfig is the NetworkConfig for the NetworkConfig API
+        description: NetworkDesign is the NetworkDesign for the NetworkDesign API
         properties:
           apiVersion:
             description: |-
@@ -43,16 +43,8 @@ spec:
           metadata:
             type: object
           spec:
-            description: NetworkConfigSpec defines the desired state of NetworkConfig
+            description: NetworkDesignSpec defines the desired state of NetworkDesign
             properties:
-              addressing:
-                default: dualstack
-                description: Addressing defines the addressing used in this network
-                enum:
-                - dualstack
-                - ipv4only
-                - ipv6only
-                type: string
               encapsulation:
                 description: Encapsultation define the encapsulation parameters
                 properties:
@@ -73,25 +65,85 @@ spec:
                   vxlan:
                     type: object
                 type: object
-              prefixes:
-                description: |-
-                  Prefixes defines the prefixes belonging to this network config
-                  prefixLength would be indicated by a label
-                items:
-                  properties:
-                    labels:
-                      additionalProperties:
+              interfaces:
+                description: Interfaces define the interface parameters of the network
+                  design
+                properties:
+                  isl:
+                    properties:
+                      addressing:
+                        default: dualstack
+                        description: Addressing defines the addressing used in this
+                          network
+                        enum:
+                        - dualstack
+                        - ipv4only
+                        - ipv6only
+                        - ipv4unnumbered
+                        - ipv6unnumbered
                         type: string
-                      description: Labels as user defined labels
-                      type: object
-                    prefix:
-                      description: Prefix defines the ip cidr in prefix notation.
-                      pattern: (([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/(([0-9])|([1-2][0-9])|(3[0-2]))|((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))(/(([0-9])|([0-9]{2})|(1[0-1][0-9])|(12[0-8])))
-                      type: string
-                  required:
-                  - prefix
-                  type: object
-                type: array
+                      bfd:
+                        description: BFD defines if BFD is enabled on the interfaces
+                          or not
+                        type: boolean
+                      prefixes:
+                        description: |-
+                          Prefixes defines the prefixes belonging to this network config
+                          prefixLength would be indicated by a label
+                        items:
+                          properties:
+                            labels:
+                              additionalProperties:
+                                type: string
+                              description: Labels as user defined labels
+                              type: object
+                            prefix:
+                              description: Prefix defines the ip cidr in prefix notation.
+                              pattern: (([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/(([0-9])|([1-2][0-9])|(3[0-2]))|((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))(/(([0-9])|([0-9]{2})|(1[0-1][0-9])|(12[0-8])))
+                              type: string
+                          required:
+                          - prefix
+                          type: object
+                        type: array
+                      vlanTagging:
+                        description: VLANTagging defines if VLAN tagging should be
+                          used or not
+                        type: boolean
+                    type: object
+                  loopback:
+                    properties:
+                      addressing:
+                        default: dualstack
+                        description: Addressing defines the addressing used in this
+                          network
+                        enum:
+                        - dualstack
+                        - ipv4only
+                        - ipv6only
+                        - ipv4unnumbered
+                        - ipv6unnumbered
+                        type: string
+                      prefixes:
+                        description: |-
+                          Prefixes defines the prefixes belonging to this network config
+                          prefixLength would be indicated by a label
+                        items:
+                          properties:
+                            labels:
+                              additionalProperties:
+                                type: string
+                              description: Labels as user defined labels
+                              type: object
+                            prefix:
+                              description: Prefix defines the ip cidr in prefix notation.
+                              pattern: (([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/(([0-9])|([1-2][0-9])|(3[0-2]))|((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))(/(([0-9])|([0-9]{2})|(1[0-1][0-9])|(12[0-8])))
+                              type: string
+                          required:
+                          - prefix
+                          type: object
+                        type: array
+                    type: object
+                type: object
               protocols:
                 description: Protocols define the network wide protocol parameters
                 properties:
@@ -117,21 +169,71 @@ spec:
                         type: array
                     type: object
                   isis:
+                    properties:
+                      instance:
+                        description: Instance defines the name of the ISIS instance
+                        type: string
+                      levelCapability:
+                        default: L2
+                        description: LevelCapability defines the level capability
+                          of the ISIS in the topology
+                        enum:
+                        - L2
+                        - L2
+                        - L1L2
+                        type: string
+                      maxECMPPaths:
+                        default: 1
+                        description: MaxECMPPaths defines the maximum ecmp paths used
+                          in OSPF
+                        format: int32
+                        maximum: 64
+                        minimum: 1
+                        type: integer
+                      net:
+                        description: Net defines the ISIS network entity title (NET)
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - net
                     type: object
                   ospf:
+                    properties:
+                      area:
+                        description: Area defines the default area used if not further
+                          refined on the interface.
+                        type: string
+                      instance:
+                        description: Instance defines the name of the OSPF instance
+                        type: string
+                      maxECMPPaths:
+                        default: 1
+                        description: MaxECMPPaths defines the maximum ecmp paths used
+                          in OSPF
+                        format: int32
+                        maximum: 64
+                        minimum: 1
+                        type: integer
+                      version:
+                        default: v2
+                        description: Version defines the Version used for ospf
+                        enum:
+                        - v2
+                        - v3
+                        type: string
+                    required:
+                    - area
+                    - version
                     type: object
                 type: object
               topology:
                 type: string
-              vlanTagging:
-                description: VLANTagging defines if VLAN tagging should be used or
-                  not
-                type: boolean
             required:
             - topology
             type: object
           status:
-            description: NetworkConfigStatus defines the observed state of NetworkConfig
+            description: NetworkDesignStatus defines the observed state of NetworkDesign
             properties:
               conditions:
                 description: Conditions of the resource.
@@ -337,19 +439,28 @@ spec:
                               type: integer
                             dynamicNeighbors:
                               properties:
-                                peerAS:
-                                  format: int32
-                                  type: integer
-                                peerGroup:
-                                  type: string
-                                peerPrefixes:
+                                interfaces:
+                                  items:
+                                    properties:
+                                      name:
+                                        type: string
+                                      peerAS:
+                                        format: int32
+                                        type: integer
+                                      peerGroup:
+                                        type: string
+                                    required:
+                                    - name
+                                    - peerAS
+                                    - peerGroup
+                                    type: object
+                                  type: array
+                                prefixes:
                                   items:
                                     type: string
                                   type: array
                               required:
-                              - peerAS
-                              - peerGroup
-                              - peerPrefixes
+                              - interfaces
                               type: object
                             neighbors:
                               items:
@@ -395,6 +506,7 @@ spec:
                                 type: object
                               type: array
                             routerID:
+                              description: RouterID for the BGP Instance
                               type: string
                           required:
                           - as
@@ -424,6 +536,210 @@ spec:
                           required:
                           - exportRouteTarget
                           - importRouteTarget
+                          type: object
+                        isis:
+                          properties:
+                            instances:
+                              items:
+                                properties:
+                                  addressFamilies:
+                                    description: AddressFamilies defines the address
+                                      families enabled in the instance
+                                    items:
+                                      type: string
+                                    type: array
+                                  interfaces:
+                                    description: Interfaces define the interface parameters
+                                      used with ISIS
+                                    items:
+                                      properties:
+                                        ipv4:
+                                          description: IPv4 define the ipv4 interface
+                                            parameters
+                                          properties:
+                                            bfd:
+                                              description: BFD defines if bfd is enabled
+                                              type: boolean
+                                          required:
+                                          - bfd
+                                          type: object
+                                        ipv6:
+                                          description: IPv6 define the ipv6 interface
+                                            parameters
+                                          properties:
+                                            bfd:
+                                              description: BFD defines if bfd is enabled
+                                              type: boolean
+                                          required:
+                                          - bfd
+                                          type: object
+                                        level:
+                                          default: 2
+                                          description: Level defines the ISIS interface
+                                            level
+                                          format: int32
+                                          maximum: 2
+                                          minimum: 1
+                                          type: integer
+                                        passive:
+                                          description: Passive allow interface to
+                                            be advertised as an ISIS interface without
+                                            running the ISIS protocol
+                                          type: boolean
+                                        subInterfaceName:
+                                          description: SubInterfaceName defines the
+                                            name and id of the sub interface
+                                          properties:
+                                            id:
+                                              format: int32
+                                              type: integer
+                                            name:
+                                              type: string
+                                          required:
+                                          - id
+                                          - name
+                                          type: object
+                                        type:
+                                          default: pointToPoint
+                                          description: Type defines the type of interface
+                                          enum:
+                                          - pointToPoint
+                                          - broadcast
+                                          type: string
+                                      required:
+                                      - level
+                                      - subInterfaceName
+                                      - type
+                                      type: object
+                                    type: array
+                                  levelCapability:
+                                    description: LevelCapability defines the level
+                                      capability of the intermediate system (router)
+                                    type: string
+                                  maxECMPPaths:
+                                    default: 1
+                                    description: MaxECMPPaths defines the maximum
+                                      ecmp paths used
+                                    format: int32
+                                    maximum: 64
+                                    minimum: 1
+                                    type: integer
+                                  name:
+                                    description: Name defines the name of the instance
+                                    type: string
+                                  net:
+                                    description: ISIS network entity title (NET)
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - interfaces
+                                - levelCapability
+                                - name
+                                - net
+                                type: object
+                              type: array
+                          required:
+                          - instances
+                          type: object
+                        ospf:
+                          properties:
+                            instances:
+                              items:
+                                properties:
+                                  areas:
+                                    description: ISIS network entity title (NET)
+                                    items:
+                                      properties:
+                                        interfaces:
+                                          description: Interfaces define the interface
+                                            parameters used with ISIS
+                                          items:
+                                            properties:
+                                              bfd:
+                                                description: BFD defines if bfd is
+                                                  enabled
+                                                type: boolean
+                                              passive:
+                                                description: Passive allow interface
+                                                  to be advertised as an interface
+                                                  without running the OSPF protocol
+                                                type: boolean
+                                              subInterfaceName:
+                                                description: SubInterfaceName defines
+                                                  the name and id of the sub interface
+                                                properties:
+                                                  id:
+                                                    format: int32
+                                                    type: integer
+                                                  name:
+                                                    type: string
+                                                required:
+                                                - id
+                                                - name
+                                                type: object
+                                              type:
+                                                default: pointToPoint
+                                                description: Type defines the type
+                                                  of interface
+                                                enum:
+                                                - pointToPoint
+                                                - broadcast
+                                                type: string
+                                            required:
+                                            - subInterfaceName
+                                            - type
+                                            type: object
+                                          type: array
+                                        name:
+                                          description: Name defines the name of the
+                                            area
+                                          type: string
+                                        nssa:
+                                          description: NSSA define the NSSA parameters
+                                          type: object
+                                        stub:
+                                          description: Stub define the stub parameters
+                                          type: object
+                                      required:
+                                      - interfaces
+                                      - name
+                                      type: object
+                                    type: array
+                                  asbr:
+                                    description: ASBR defines if the router is an
+                                      ASBR (Autonomous System Boundary Router)
+                                    type: boolean
+                                  maxECMPPaths:
+                                    default: 1
+                                    description: MaxECMPPaths defines the maximum
+                                      ecmp paths used
+                                    format: int32
+                                    maximum: 64
+                                    minimum: 1
+                                    type: integer
+                                  name:
+                                    description: Name defines the name of the instance
+                                    type: string
+                                  routerID:
+                                    description: RouterID of the instance
+                                    type: string
+                                  version:
+                                    default: v2
+                                    description: Version defines the Version used
+                                      for ospf
+                                    enum:
+                                    - v2
+                                    - v3
+                                    type: string
+                                required:
+                                - name
+                                - routerID
+                                - version
+                                type: object
+                              type: array
+                          required:
+                          - instances
                           type: object
                       type: object
                     type:
@@ -635,11 +951,11 @@ spec:
           spec:
             description: NetworkSpec defines the desired state of Network
             properties:
-              bridgeDomains:
+              bridges:
                 description: |-
-                  BridgeDomains define a set of logical ports that share the same
+                  Bridges define a set of logical ports that share the same
                   flooding or broadcast characteristics. Like a virtual LAN (VLAN),
-                  a bridge domain spans one or more ports of multiple devices.
+                  a bridge can span one or more ports of multiple devices.
                 items:
                   properties:
                     interfaces:
@@ -647,8 +963,8 @@ spec:
                         the bridge domain
                       items:
                         description: |-
-                          Network defines the interface parameters
-                          An interface can be attached to a routingTable and a bridgeDomain.
+                          NetworkInterface defines the interface parameters
+                          An interface can be attached to a Router and/or a Bridge.
                           Dynamic or static assignments are possible
                         properties:
                           addresses:
@@ -664,10 +980,10 @@ spec:
                               - address
                               type: object
                             type: array
-                          bridgeDomain:
+                          bridge:
                             description: |-
-                              BridgeDomain defines the name of the bridgeDomain belonging to the interface
-                              A BridgeDomain can only be attached to a routingTable and is mutualy exclusive with a
+                              Bridge defines the name of the bridge belonging to the interface
+                              A bridge can only be attached to a router and is mutualy exclusive with a
                               defined Endpoint
                             type: string
                           endpoint:
@@ -772,12 +1088,12 @@ spec:
                   - name
                   type: object
                 type: array
-              routingTables:
+              routers:
                 description: |-
-                  RoutingTables defines a set of routes belonging to a given routing instance
-                  Multiple routing tables are also called virtual routing instances. Each virtual
+                  Routers defines a set of routes belonging to a given routing instance
+                  A Router can also be called a virtual routing instances. Each virtual
                   routing instance can hold overlapping IP information
-                  A routing table supports both ipv4 and ipv6
+                  A router supports both ipv4 and ipv6
                 items:
                   properties:
                     interfaces:
@@ -785,8 +1101,8 @@ spec:
                         the routing table
                       items:
                         description: |-
-                          Network defines the interface parameters
-                          An interface can be attached to a routingTable and a bridgeDomain.
+                          NetworkInterface defines the interface parameters
+                          An interface can be attached to a Router and/or a Bridge.
                           Dynamic or static assignments are possible
                         properties:
                           addresses:
@@ -802,10 +1118,10 @@ spec:
                               - address
                               type: object
                             type: array
-                          bridgeDomain:
+                          bridge:
                             description: |-
-                              BridgeDomain defines the name of the bridgeDomain belonging to the interface
-                              A BridgeDomain can only be attached to a routingTable and is mutualy exclusive with a
+                              Bridge defines the name of the bridge belonging to the interface
+                              A bridge can only be attached to a router and is mutualy exclusive with a
                               defined Endpoint
                             type: string
                           endpoint:
@@ -904,7 +1220,7 @@ spec:
                       description: Name defines the name of the routing table
                       type: string
                     networkID:
-                      description: NetworkID defines the id of the bridge domain
+                      description: NetworkID defines the id of router
                       type: integer
                   required:
                   - name
@@ -1200,7 +1516,7 @@ spec:
           value: "true"
         - name: ENABLE_LINK
           value: "true"
-        - name: ENABLE_NETWORKCONFIG
+        - name: ENABLE_NETWORKDESIGN
           value: "true"
         - name: ENABLE_NETWORK
           value: "true"
@@ -1210,7 +1526,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.7
+        image: ghcr.io/kuidio/kuidapps:v0.0.8
         imagePullPolicy: Always
         name: kuidapps
       securityContext:

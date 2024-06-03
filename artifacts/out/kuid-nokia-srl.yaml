@@ -156,7 +156,7 @@ spec:
           value: "true"
         - name: ENABLE_DEVICECONFIG
           value: "true"
-        image: ghcr.io/kuidio/nokia-srl:v0.0.4
+        image: ghcr.io/kuidio/nokia-srl:v0.0.5
         imagePullPolicy: Always
         name: kuid-nokia-srl
         volumeMounts:
