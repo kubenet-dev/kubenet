@@ -1150,8 +1150,8 @@ spec:
         - --config=/config/data-server.yaml
         command:
         - /app/data-server
-        #image: ghcr.io/sdcio/data-server:v0.0.37
-        image: registry.k8s.sdcio.dev/sdcio/data-server:v0.0.0-choicecase-latest
+        image: ghcr.io/sdcio/data-server:v0.0.37
+        #image: registry.k8s.sdcio.dev/sdcio/data-server:v0.0.0-choicecase-latest
         imagePullPolicy: Always
         name: data-server
         volumeMounts:
