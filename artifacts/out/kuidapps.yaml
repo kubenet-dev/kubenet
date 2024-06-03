@@ -607,7 +607,6 @@ spec:
                                           - name
                                           type: object
                                         type:
-                                          default: pointToPoint
                                           description: Type defines the type of interface
                                           enum:
                                           - pointToPoint
@@ -616,7 +615,6 @@ spec:
                                       required:
                                       - level
                                       - subInterfaceName
-                                      - type
                                       type: object
                                     type: array
                                   levelCapability:
@@ -695,7 +693,6 @@ spec:
                                                 type: string
                                             required:
                                             - subInterfaceName
-                                            - type
                                             type: object
                                           type: array
                                         name:
@@ -1533,7 +1530,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.9
+        image: ghcr.io/kuidio/kuidapps:v0.0.10
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
