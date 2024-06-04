@@ -156,7 +156,7 @@ spec:
           value: "true"
         - name: ENABLE_DEVICECONFIG
           value: "true"
-        image: ghcr.io/kuidio/nokia-srl:v0.0.6
+        image: ghcr.io/kuidio/nokia-srl:v0.0.7
         imagePullPolicy: Always
         name: kuid-nokia-srl
         volumeMounts:
@@ -626,10 +626,9 @@ data:
                 "import-reject-all": false,
                 "export-reject-all": false
                 },
-            {{- range $index, $element := .PeerGroups}}
-            {{- if eq "underlay" $element.Name }}
               "afi-safi": [
-            {{- range $index, $af := $element.AddressFamilies}}
+            {{- range $index, $af := .AddressFamilies}}
+              {{- if $index}},{{- end}}
                 {
                   "afi-safi-name": "{{ $af }}",
                   "admin-state": "enable"{{- if or (eq $af "ipv4-unicast") (eq $af "ipv6-unicast")}},{{- end }}
@@ -640,11 +639,9 @@ data:
                     "max-paths-level-2": 64
                   }
               {{- end }}
-                }{{- if lt $index (dec (len $element.AddressFamilies))}},{{end}}
-              {{- end }}
+                }
+            {{- end }}
               ],
-            {{- end }}
-            {{- end }}
               "group": [
             {{- range $index, $element := .PeerGroups}}
                {{- if $index}},{{- end}}
@@ -697,7 +694,7 @@ data:
                     {{- if $index}},{{- end}}
                     {
                       "afi-safi-name": "{{ $af }}",
-                      "admin-state": "enable"
+                      "admin-state": "disable"
                     }
                   {{- end }}
                   ]{{- if .RouteReflector }},{{- end }}
@@ -773,7 +770,7 @@ data:
             {{- end }}
             {{- if ne 0 (len .Interfaces)}}
                   ,
-                  "interfaces": [
+                  "interface": [
             {{- range $index, $itfce := .Interfaces}}
                     {{- if $index}},{{- end}}
                     {
@@ -785,18 +782,25 @@ data:
     {{- end}}
   srl_networkinstance_isis_instance_interface.tmpl: |-
     {{define "srlnetworkinstanceisisinstanceinterface"}}
-                      "name": "{{ (ifName .SubInterfaceName.Name) }}.{{ .SubInterfaceName.ID}}",
+                      "interface-name": "{{ (ifName .SubInterfaceName.Name) }}.{{ .SubInterfaceName.ID}}",
                       "admin-state": "enable",
                 {{- if .Passive }}
                       "passive": {{.Passive}},
+                      "circuit-type": "point-to-point",
                 {{- else }}
-                      "circuit-type": "{{ .Type }}",
+                      "circuit-type": "point-to-point",
                 {{- end }}
                       "level": [
                         {
                           "level-number": {{.Level}}
                         }
-                      ]
+                      ],
+                      "ipv4-unicast": {
+                        "admin-state": "enable"
+                      },
+                      "ipv6-unicast": {
+                        "admin-state": "enable"
+                      }
     {{- end}}
   srl_networkinstance_ospf.tmpl: |-
     {{define "srlnetworkinstanceospf"}}
