@@ -4,15 +4,15 @@ apps:
 - name: kuid-server
   url: https://raw.githubusercontent.com/kuidio/kuid/latest/artifacts/out/artifacts.yaml
   image: ghcr.io/kuidio/kuid-server:latest
-  version: v0.0.4
+  version: v0.0.5
 - name: kuidapps
   url: https://raw.githubusercontent.com/kuidio/kuidapps/latest/artifacts/out/artifacts.yaml
   image: ghcr.io/kuidio/kuidapps:latest
-  version: v0.0.11
+  version: v0.0.12
 - name: kuid-nokia-srl
   url: https://raw.githubusercontent.com/kuidio/nokia-srl/latest/artifacts/out/artifacts.yaml
   image: ghcr.io/kuidio/nokia-srl:latest
-  version: v0.0.7
+  version: v0.0.8
 - name: pkgserver
   url: https://raw.githubusercontent.com/pkgserver-dev/pkgserver/latest/artifacts/out/artifacts.yaml
   image: ghcr.io/pkgserver-dev/pkgserver:latest

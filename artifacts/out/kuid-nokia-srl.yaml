@@ -156,7 +156,7 @@ spec:
           value: "true"
         - name: ENABLE_DEVICECONFIG
           value: "true"
-        image: ghcr.io/kuidio/nokia-srl:v0.0.7
+        image: ghcr.io/kuidio/nokia-srl:v0.0.8
         imagePullPolicy: Always
         name: kuid-nokia-srl
         volumeMounts:
@@ -688,7 +688,9 @@ data:
                   "group-name": "{{.Name}}",
                   "export-policy": "{{.Name}}",
                   "admin-state": "enable",
-                  "next-hop-self": true,
+                  "next-hop-self": true
+             {{- if ne 0 (len .AddressFamilies)}}
+                  ,
                   "afi-safi": [
                   {{- range $index, $af := .AddressFamilies}}
                     {{- if $index}},{{- end}}
@@ -697,8 +699,10 @@ data:
                       "admin-state": "disable"
                     }
                   {{- end }}
-                  ]{{- if .RouteReflector }},{{- end }}
+                  ]
+             {{- end }}
                   {{- if .RouteReflector }}
+                  ,
                   "route-reflector": {
                     "client": true,
                     "cluster-id": "{{ .RouteReflector.ClusterID }}"
