@@ -156,7 +156,7 @@ spec:
           value: "true"
         - name: ENABLE_DEVICECONFIG
           value: "true"
-        image: ghcr.io/kuidio/nokia-srl:v0.0.9
+        image: ghcr.io/kuidio/nokia-srl:v0.0.10
         imagePullPolicy: Always
         name: kuid-nokia-srl
         volumeMounts:
@@ -861,7 +861,7 @@ data:
                 {{- if .Passive }}
                           "passive": {{.Passive}}
                 {{- else }}
-                          "interface-type": "{{ .Type }}"
+                          "interface-type": "point-to-point"
                 {{- end }}
     {{- end}}
   srl_routingpolicy.tmpl: |-
