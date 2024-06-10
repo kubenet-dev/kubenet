@@ -769,8 +769,6 @@ spec:
                                           - name
                                           type: object
                                       required:
-                                      - level1
-                                      - level2
                                       - subInterfaceName
                                       type: object
                                     type: array
@@ -1709,7 +1707,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.19
+        image: ghcr.io/kuidio/kuidapps:v0.0.20
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
