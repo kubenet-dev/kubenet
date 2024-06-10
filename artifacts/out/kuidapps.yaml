@@ -1698,7 +1698,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.24
+        image: ghcr.io/kuidio/kuidapps:v0.0.25
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
