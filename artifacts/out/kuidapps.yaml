@@ -600,7 +600,6 @@ spec:
                                   peerGroup:
                                     type: string
                                 required:
-                                - bfd
                                 - localAS
                                 - localAddress
                                 - peerAS
@@ -617,6 +616,8 @@ spec:
                                     items:
                                       type: string
                                     type: array
+                                  bfd:
+                                    type: boolean
                                   name:
                                     type: string
                                   routeReflector:
@@ -1697,7 +1698,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.22
+        image: ghcr.io/kuidio/kuidapps:v0.0.23
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
