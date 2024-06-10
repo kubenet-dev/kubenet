@@ -69,47 +69,6 @@ spec:
                 description: Interfaces define the interface parameters of the network
                   design
                 properties:
-                  isl:
-                    properties:
-                      addressing:
-                        default: dualstack
-                        description: Addressing defines the addressing used in this
-                          network
-                        enum:
-                        - dualstack
-                        - ipv4only
-                        - ipv6only
-                        - ipv4unnumbered
-                        - ipv6unnumbered
-                        type: string
-                      bfd:
-                        description: BFD defines if BFD is enabled on the interfaces
-                          or not
-                        type: boolean
-                      prefixes:
-                        description: |-
-                          Prefixes defines the prefixes belonging to this network config
-                          prefixLength would be indicated by a label
-                        items:
-                          properties:
-                            labels:
-                              additionalProperties:
-                                type: string
-                              description: Labels as user defined labels
-                              type: object
-                            prefix:
-                              description: Prefix defines the ip cidr in prefix notation.
-                              pattern: (([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/(([0-9])|([1-2][0-9])|(3[0-2]))|((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))(/(([0-9])|([0-9]{2})|(1[0-1][0-9])|(12[0-8])))
-                              type: string
-                          required:
-                          - prefix
-                          type: object
-                        type: array
-                      vlanTagging:
-                        description: VLANTagging defines if VLAN tagging should be
-                          used or not
-                        type: boolean
-                    type: object
                   loopback:
                     properties:
                       addressing:
@@ -143,6 +102,82 @@ spec:
                           type: object
                         type: array
                     type: object
+                  underlay:
+                    properties:
+                      addressing:
+                        default: dualstack
+                        description: Addressing defines the addressing used in this
+                          network
+                        enum:
+                        - dualstack
+                        - ipv4only
+                        - ipv6only
+                        - ipv4unnumbered
+                        - ipv6unnumbered
+                        type: string
+                      bfd:
+                        description: BFD defines the bfd parameters on the interface
+                        properties:
+                          enabled:
+                            description: Disabled defines if bfd is disabled or not
+                            type: boolean
+                          minEchoRx:
+                            default: 0
+                            description: MinEchoRx defines the echo function timer,
+                              in msec.
+                            format: int32
+                            type: integer
+                          minRx:
+                            default: 1000
+                            description: MinTx defines the required minimal interval
+                              for receiving BFD packets, in msec.
+                            format: int32
+                            type: integer
+                          minTx:
+                            default: 1000
+                            description: MinTx defines the desired minimal interval
+                              for sending BFD packets, in msec.
+                            format: int32
+                            type: integer
+                          multiplier:
+                            default: 5
+                            description: Multiplier defines the number of missed packets
+                              before the session is considered down
+                            format: int32
+                            type: integer
+                          ttl:
+                            default: 1
+                            description: TTL defines the time to live on the outgoing
+                              BFD packet
+                            format: int32
+                            maximum: 255
+                            minimum: 1
+                            type: integer
+                        type: object
+                      prefixes:
+                        description: |-
+                          Prefixes defines the prefixes belonging to this network config
+                          prefixLength would be indicated by a label
+                        items:
+                          properties:
+                            labels:
+                              additionalProperties:
+                                type: string
+                              description: Labels as user defined labels
+                              type: object
+                            prefix:
+                              description: Prefix defines the ip cidr in prefix notation.
+                              pattern: (([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/(([0-9])|([1-2][0-9])|(3[0-2]))|((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))(/(([0-9])|([0-9]{2})|(1[0-1][0-9])|(12[0-8])))
+                              type: string
+                          required:
+                          - prefix
+                          type: object
+                        type: array
+                      vlanTagging:
+                        description: VLANTagging defines if VLAN tagging should be
+                          used or not
+                        type: boolean
+                    type: object
                 type: object
               protocols:
                 description: Protocols define the network wide protocol parameters
@@ -163,6 +198,9 @@ spec:
                     properties:
                       asPool:
                         type: string
+                      bfd:
+                        description: BFD defines if BFD is enabled globally on EBGP
+                        type: boolean
                     type: object
                   ibgp:
                     properties:
@@ -183,10 +221,13 @@ spec:
                         items:
                           type: string
                         type: array
+                      bfd:
+                        description: BFD defines if BFD is enabled globally on ISIS
+                        type: boolean
                       instance:
                         description: Instance defines the name of the ISIS instance
                         type: string
-                      levelCapability:
+                      level:
                         default: L2
                         description: LevelCapability defines the level capability
                           of the ISIS in the topology
@@ -212,6 +253,9 @@ spec:
                         description: Area defines the default area used if not further
                           refined on the interface.
                         type: string
+                      bfd:
+                        description: BFD defines if BFD is enabled globally on OSPF
+                        type: boolean
                       instance:
                         description: Instance defines the name of the OSPF instance
                         type: string
@@ -360,6 +404,71 @@ spec:
           spec:
             description: NetworkDeviceDeviceSpec defines the desired state of NetworkDevice
             properties:
+              bfd:
+                description: BFD defines the bfd parameters for the device config
+                properties:
+                  interfaces:
+                    items:
+                      properties:
+                        bfd:
+                          description: BFD defines the bfd parameters of the interface
+                          properties:
+                            enabled:
+                              description: Disabled defines if bfd is disabled or
+                                not
+                              type: boolean
+                            minEchoRx:
+                              default: 0
+                              description: MinEchoRx defines the echo function timer,
+                                in msec.
+                              format: int32
+                              type: integer
+                            minRx:
+                              default: 1000
+                              description: MinTx defines the required minimal interval
+                                for receiving BFD packets, in msec.
+                              format: int32
+                              type: integer
+                            minTx:
+                              default: 1000
+                              description: MinTx defines the desired minimal interval
+                                for sending BFD packets, in msec.
+                              format: int32
+                              type: integer
+                            multiplier:
+                              default: 5
+                              description: Multiplier defines the number of missed
+                                packets before the session is considered down
+                              format: int32
+                              type: integer
+                            ttl:
+                              default: 1
+                              description: TTL defines the time to live on the outgoing
+                                BFD packet
+                              format: int32
+                              maximum: 255
+                              minimum: 1
+                              type: integer
+                          type: object
+                        subInterfaceName:
+                          description: SubInterfaceName defines the name and id of
+                            the sub interface
+                          properties:
+                            id:
+                              format: int32
+                              type: integer
+                            name:
+                              type: string
+                          required:
+                          - id
+                          - name
+                          type: object
+                      required:
+                      - bfd
+                      - subInterfaceName
+                      type: object
+                    type: array
+                type: object
               interfaces:
                 description: Interfaces defines the interfaces for the device config
                 items:
@@ -486,6 +595,8 @@ spec:
                             neighbors:
                               items:
                                 properties:
+                                  bfd:
+                                    type: boolean
                                   localAS:
                                     format: int32
                                     type: integer
@@ -499,6 +610,7 @@ spec:
                                   peerGroup:
                                     type: string
                                 required:
+                                - bfd
                                 - localAS
                                 - localAddress
                                 - peerAS
@@ -596,14 +708,47 @@ spec:
                                           required:
                                           - bfd
                                           type: object
-                                        level:
-                                          default: 2
-                                          description: Level defines the ISIS interface
-                                            level
-                                          format: int32
-                                          maximum: 2
-                                          minimum: 1
-                                          type: integer
+                                        level1:
+                                          description: Level1 defines the ISIS interface
+                                            level1
+                                          properties:
+                                            disable:
+                                              type: boolean
+                                            metric:
+                                              format: int32
+                                              type: integer
+                                            metricIPv6Unicast:
+                                              format: int32
+                                              type: integer
+                                          required:
+                                          - disable
+                                          - metric
+                                          - metricIPv6Unicast
+                                          type: object
+                                        level2:
+                                          description: Level2 defines the ISIS interface
+                                            level2
+                                          properties:
+                                            disable:
+                                              type: boolean
+                                            metric:
+                                              format: int32
+                                              type: integer
+                                            metricIPv6Unicast:
+                                              format: int32
+                                              type: integer
+                                          required:
+                                          - disable
+                                          - metric
+                                          - metricIPv6Unicast
+                                          type: object
+                                        networkType:
+                                          description: NetworkType defines the type
+                                            of network on the interface
+                                          enum:
+                                          - pointToPoint
+                                          - broadcast
+                                          type: string
                                         passive:
                                           description: Passive allow interface to
                                             be advertised as an ISIS interface without
@@ -622,17 +767,30 @@ spec:
                                           - id
                                           - name
                                           type: object
-                                        type:
-                                          description: Type defines the type of interface
-                                          enum:
-                                          - pointToPoint
-                                          - broadcast
-                                          type: string
                                       required:
-                                      - level
+                                      - level1
+                                      - level2
                                       - subInterfaceName
                                       type: object
                                     type: array
+                                  level1:
+                                    description: Level1 defines the ISIS interface
+                                      level1
+                                    properties:
+                                      metricStryle:
+                                        type: string
+                                    required:
+                                    - metricStryle
+                                    type: object
+                                  level2:
+                                    description: Level2 defines the ISIS interface
+                                      level2
+                                    properties:
+                                      metricStryle:
+                                        type: string
+                                    required:
+                                    - metricStryle
+                                    type: object
                                   levelCapability:
                                     description: LevelCapability defines the level
                                       capability of the intermediate system (router)
@@ -655,6 +813,8 @@ spec:
                                     type: array
                                 required:
                                 - interfaces
+                                - level1
+                                - level2
                                 - levelCapability
                                 - name
                                 - net
@@ -669,7 +829,8 @@ spec:
                               items:
                                 properties:
                                   areas:
-                                    description: ISIS network entity title (NET)
+                                    description: Areas define the areas in the ospf
+                                      instance
                                     items:
                                       properties:
                                         interfaces:
@@ -681,6 +842,14 @@ spec:
                                                 description: BFD defines if bfd is
                                                   enabled
                                                 type: boolean
+                                              networkType:
+                                                default: pointToPoint
+                                                description: Type defines the type
+                                                  of interface
+                                                enum:
+                                                - pointToPoint
+                                                - broadcast
+                                                type: string
                                               passive:
                                                 description: Passive allow interface
                                                   to be advertised as an interface
@@ -699,14 +868,6 @@ spec:
                                                 - id
                                                 - name
                                                 type: object
-                                              type:
-                                                default: pointToPoint
-                                                description: Type defines the type
-                                                  of interface
-                                                enum:
-                                                - pointToPoint
-                                                - broadcast
-                                                type: string
                                             required:
                                             - subInterfaceName
                                             type: object
@@ -1546,7 +1707,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.15
+        image: ghcr.io/kuidio/kuidapps:v0.0.16
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
