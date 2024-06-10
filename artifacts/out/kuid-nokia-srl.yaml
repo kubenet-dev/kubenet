@@ -156,7 +156,7 @@ spec:
           value: "true"
         - name: ENABLE_DEVICECONFIG
           value: "true"
-        image: ghcr.io/kuidio/nokia-srl:v0.0.11
+        image: ghcr.io/kuidio/nokia-srl:v0.0.12
         imagePullPolicy: Always
         name: kuid-nokia-srl
         volumeMounts:
@@ -403,12 +403,12 @@ apiVersion: v1
 data:
   main.tmpl: |-
     {
-      {{- if .System }}
+    {{- if .System }}
       "system": {
         {{- template "srlsystem" .System}}
       },
-      {{- end }}
-      {{- if ne 0 (len .Interfaces)}}
+    {{- end }}
+    {{- if ne 0 (len .Interfaces)}}
       "interface": [
       {{- range $index, $interface := .Interfaces}}
         {{- if $index}},{{- end}}
@@ -417,8 +417,8 @@ data:
         }
       {{- end}}
       ]{{if ne 0 (len $.NetworkInstances)}},{{end}}
-      {{- end}}
-      {{- if ne 0 (len $.NetworkInstances)}}
+    {{- end}}
+    {{- if ne 0 (len $.NetworkInstances)}}
       "network-instance": [
       {{- range $index, $ni := .NetworkInstances}}
         {{- if $index}},{{- end}}
@@ -427,13 +427,13 @@ data:
         }
       {{- end}}
       ]{{if or (ne 0 (len $.RoutingPolicies)) (ne 0 (len $.TunnelInterfaces)) }},{{end}}
-      {{- end}}
-      {{- if ne 0 (len $.RoutingPolicies)}}
+    {{- end}}
+    {{- if ne 0 (len $.RoutingPolicies)}}
       "routing-policy": {
           {{- template "srlroutingpolicy" .}}
       },
-      {{- end}}
-      {{- if ne 0 (len $.TunnelInterfaces)}}
+    {{- end}}
+    {{- if ne 0 (len $.TunnelInterfaces)}}
       "tunnel-interface": [
       {{- range $index, $interface := .TunnelInterfaces}}
         {{- if $index}},{{- end}}
@@ -442,8 +442,54 @@ data:
         }
       {{- end}}
       ]
-      {{- end}}
+    {{- end}}
+    {{- if .BFD }}
+      ,
+      "bfd": {
+        {{- template "srlbfd" .BFD}}
+      }
+    {{- end}}
     }
+  srl_bfd.tmpl: |-
+    {{define "srlbfd"}}
+    {{- if ne 0 (len .Interfaces)}}
+          "subinterface": [
+        {{- range $index, $itfce := .Interfaces }}
+        {{- if $index}},{{- end}}
+           {
+            "id": "{{ (ifName $itfce.SubInterfaceName.Name) }}.{{ $itfce.SubInterfaceName.ID}}"
+          {{- if (derefBool $itfce.BFD.Enabled) }}
+            ,
+            "admin-state": "enable"
+          {{- else }}
+            ,
+            "admin-state": "disable"
+          {{- end }}
+          {{- if ne (derefUint32 $itfce.BFD.MinEchoRx) 0 }}
+            ,
+            "minimum-echo-receive-interval": {{ (derefUint32 $itfce.BFD.MinEchoRx) }}
+          {{- end }}
+          {{- if ne (derefUint32 $itfce.BFD.MinRx) 0 }}
+            ,
+            "required-minimum-receive": {{ (derefUint32 $itfce.BFD.MinRx) }}
+          {{- end }}
+          {{- if ne (derefUint32 $itfce.BFD.MinTx) 0 }}
+            ,
+            "desired-minimum-transmit-interval": {{ (derefUint32 $itfce.BFD.MinTx) }}
+          {{- end }}
+          {{- if ne (derefUint32 $itfce.BFD.Multiplier) 0 }}
+            ,
+            "detection-multiplier": {{ (derefUint32 $itfce.BFD.Multiplier) }}
+          {{- end }}
+          {{- if ne (derefUint32 $itfce.BFD.TTL) 0 }}
+            ,
+            "max-hop-count": {{ (derefUint32 $itfce.BFD.TTL) }}
+          {{- end }}
+           }
+        {{- end }}
+          ]
+    {{- end }}
+    {{- end}}
   srl_interface.tmpl: |-
     {{define "srlinterface"}}
           "name": "{{ (ifName .Name ) }}",
@@ -674,6 +720,12 @@ data:
                     "local-address": "{{.LocalAddress}}"
                   }
             {{- end}}
+            {{- if .BFD }}
+                  ,
+                  "failure-detection": {
+                    "enable-bfd": true
+                  }
+            {{- end }}
     {{- end}}
   srl_networkinstance_bgp_neighbor_dynamic.tmpl: |-
     {{define "srlnetworkinstancebgpneighbordynamic"}}
@@ -759,6 +811,25 @@ data:
               {{- end}}
                   ],
             {{- end }}
+            {{- if or .Level1 .Level2}}
+                  "level": [
+              {{- if .Level1 }}
+                    {
+                      "level-number": "1",
+                      "metric-style": "{{ (isisMetricStyle .Level1.MetricStyle )}}"
+                    }
+              {{- end }}
+              {{- if .Level2 }}
+                    ,
+                    {
+                      "level-number": "2",
+                      "metric-style": "{{ (isisMetricStyle .Level1.MetricStyle )}}"
+                    }
+              {{- end }}
+                   ]
+            {{- end }}
+            {{- if ne 0 (len .AddressFamilies ) }}
+                  ,
             {{- range $index, $af := .AddressFamilies}}
                   {{- if $index}},{{- end}}
                {{- if eq $af "ipv4-unicast" }}
@@ -771,6 +842,7 @@ data:
                     "admin-state": "enable"
                   }
                {{- end}}
+            {{- end }}
             {{- end }}
             {{- if ne 0 (len .Interfaces)}}
                   ,
@@ -790,21 +862,69 @@ data:
                       "admin-state": "enable",
                 {{- if .Passive }}
                       "passive": {{.Passive}},
-                      "circuit-type": "point-to-point",
+                      "circuit-type": "{{ (networkType .NetworkType) }}",
                 {{- else }}
-                      "circuit-type": "point-to-point",
+                      "circuit-type": "{{ (networkType .NetworkType) }}",
                 {{- end }}
                       "level": [
+                {{- if .Level1 }}
                         {
-                          "level-number": {{.Level}}
+                          "level-number": "1"
+                      {{- if ne 0 .Level1.Metric }}
+                          ,
+                          "metric": {{ .Level1.Metric }}
+                      {{- end }}
+                      {{- if ne 0 .Level1.MetricIPv6Unicast }}
+                          ,
+                          "ipv6-unicast-metric": {{ .Level1.MetricIPv6Unicast }}
+                      {{- end }}
+                       {{- if ne 0 .Level1.Disable }}
+                          ,
+                          "disable": {{ .Level1.Disable }}
+                      {{- end }}
                         }
-                      ],
+                {{- end }}
+                {{- if .Level2 }}
+                        ,
+                        {
+                          "level-number": "2"
+                      {{- if ne 0 .Level2.Metric }}
+                          ,
+                          "metric": {{ .Level2.Metric }}
+                      {{- end }}
+                      {{- if ne 0 .Level2.MetricIPv6Unicast }}
+                          ,
+                          "ipv6-unicast-metric": {{ .Level2.MetricIPv6Unicast }}
+                      {{- end }}
+                       {{- if ne 0 .Level2.Disable }}
+                          ,
+                          "disable": {{ .Level2.Disable }}
+                      {{- end }}
+                        }
+                {{- end }}
+                      ]
+                {{- if .IPv4 }}
+                      ,
                       "ipv4-unicast": {
                         "admin-state": "enable"
-                      },
+                   {{- if .IPv4.BFD }}
+                        ,
+                        "enable-bfd": true,
+                        "include-bfd-tlv": true
+                   {{- end }}
+                      }
+                {{- end }}
+                {{- if .IPv4 }}
+                      ,
                       "ipv6-unicast": {
                         "admin-state": "enable"
+                   {{- if .IPv6.BFD }}
+                        ,
+                        "enable-bfd": true,
+                        "include-bfd-tlv": true
+                   {{- end }}
                       }
+                {{- end }}
     {{- end}}
   srl_networkinstance_ospf.tmpl: |-
     {{define "srlnetworkinstanceospf"}}
@@ -861,7 +981,13 @@ data:
                 {{- if .Passive }}
                           "passive": {{.Passive}}
                 {{- else }}
-                          "interface-type": "point-to-point"
+                          "interface-type": "{{ (networkType .NetworkType) }}"
+                {{- end }}
+                {{- if .BFD }}
+                          ,
+                          "failure-detection": {
+                            "enable-bfd": true
+                          }
                 {{- end }}
     {{- end}}
   srl_routingpolicy.tmpl: |-
