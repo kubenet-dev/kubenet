@@ -748,6 +748,7 @@ spec:
                                           enum:
                                           - pointToPoint
                                           - broadcast
+                                          - unknown
                                           type: string
                                         passive:
                                           description: Passive allow interface to
@@ -849,6 +850,7 @@ spec:
                                                 enum:
                                                 - pointToPoint
                                                 - broadcast
+                                                - unknown
                                                 type: string
                                               passive:
                                                 description: Passive allow interface
@@ -1707,7 +1709,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.17
+        image: ghcr.io/kuidio/kuidapps:v0.0.18
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
