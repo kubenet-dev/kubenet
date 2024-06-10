@@ -184,7 +184,7 @@ spec:
           value: "true"
         - name: ENABLE_GENIDCLAIM
           value: "true"
-        image: ghcr.io/kuidio/kuid-server:v0.0.6
+        image: ghcr.io/kuidio/kuid-server:v0.0.7
         imagePullPolicy: Always
         name: kuid-server
         volumeMounts:

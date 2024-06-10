@@ -122,36 +122,31 @@ spec:
                             description: Disabled defines if bfd is disabled or not
                             type: boolean
                           minEchoRx:
-                            default: 0
                             description: MinEchoRx defines the echo function timer,
                               in msec.
                             format: int32
                             type: integer
                           minRx:
-                            default: 1000
                             description: MinTx defines the required minimal interval
                               for receiving BFD packets, in msec.
                             format: int32
                             type: integer
                           minTx:
-                            default: 1000
                             description: MinTx defines the desired minimal interval
                               for sending BFD packets, in msec.
                             format: int32
                             type: integer
                           multiplier:
-                            default: 5
                             description: Multiplier defines the number of missed packets
                               before the session is considered down
                             format: int32
                             type: integer
                           ttl:
-                            default: 1
                             description: TTL defines the time to live on the outgoing
                               BFD packet
                             format: int32
                             maximum: 255
-                            minimum: 1
+                            minimum: 2
                             type: integer
                         type: object
                       prefixes:
@@ -418,36 +413,31 @@ spec:
                                 not
                               type: boolean
                             minEchoRx:
-                              default: 0
                               description: MinEchoRx defines the echo function timer,
                                 in msec.
                               format: int32
                               type: integer
                             minRx:
-                              default: 1000
                               description: MinTx defines the required minimal interval
                                 for receiving BFD packets, in msec.
                               format: int32
                               type: integer
                             minTx:
-                              default: 1000
                               description: MinTx defines the desired minimal interval
                                 for sending BFD packets, in msec.
                               format: int32
                               type: integer
                             multiplier:
-                              default: 5
                               description: Multiplier defines the number of missed
                                 packets before the session is considered down
                               format: int32
                               type: integer
                             ttl:
-                              default: 1
                               description: TTL defines the time to live on the outgoing
                                 BFD packet
                               format: int32
                               maximum: 255
-                              minimum: 1
+                              minimum: 2
                               type: integer
                           type: object
                         subInterfaceName:
@@ -1707,7 +1697,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.20
+        image: ghcr.io/kuidio/kuidapps:v0.0.21
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
