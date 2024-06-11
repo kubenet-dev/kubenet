@@ -156,7 +156,7 @@ spec:
           value: "true"
         - name: ENABLE_DEVICECONFIG
           value: "true"
-        image: ghcr.io/kuidio/nokia-srl:v0.0.14
+        image: ghcr.io/kuidio/nokia-srl:v0.0.15
         imagePullPolicy: Always
         name: kuid-nokia-srl
         volumeMounts:
@@ -458,32 +458,32 @@ data:
         {{- if $index}},{{- end}}
            {
             "id": "{{ (ifName $itfce.SubInterfaceName.Name) }}.{{ $itfce.SubInterfaceName.ID}}"
-          {{- if (derefBool $itfce.BFD.Enabled) }}
+          {{- if (derefBool $itfce.BFDLinkParameters.Enabled) }}
             ,
             "admin-state": "enable"
           {{- else }}
             ,
             "admin-state": "disable"
           {{- end }}
-          {{- if ne (derefUint32 $itfce.BFD.MinEchoRx) 0 }}
+          {{- if ne (derefUint32 $itfce.BFDLinkParameters.MinEchoRx) 0 }}
             ,
-            "minimum-echo-receive-interval": {{ (derefUint32 $itfce.BFD.MinEchoRx) }}
+            "minimum-echo-receive-interval": {{ (derefUint32 $itfce.BFDLinkParameters.MinEchoRx) }}
           {{- end }}
-          {{- if ne (derefUint32 $itfce.BFD.MinRx) 0 }}
+          {{- if ne (derefUint32 $itfce.BFDLinkParameters.MinRx) 0 }}
             ,
-            "required-minimum-receive": {{ (derefUint32 $itfce.BFD.MinRx) }}
+            "required-minimum-receive": {{ (derefUint32 $itfce.BFDLinkParameters.MinRx) }}
           {{- end }}
-          {{- if ne (derefUint32 $itfce.BFD.MinTx) 0 }}
+          {{- if ne (derefUint32 $itfce.BFDLinkParameters.MinTx) 0 }}
             ,
-            "desired-minimum-transmit-interval": {{ (derefUint32 $itfce.BFD.MinTx) }}
+            "desired-minimum-transmit-interval": {{ (derefUint32 $itfce.BFDLinkParameters.MinTx) }}
           {{- end }}
-          {{- if ne (derefUint32 $itfce.BFD.Multiplier) 0 }}
+          {{- if ne (derefUint32 $itfce.BFDLinkParameters.Multiplier) 0 }}
             ,
-            "detection-multiplier": {{ (derefUint32 $itfce.BFD.Multiplier) }}
+            "detection-multiplier": {{ (derefUint32 $itfce.BFDLinkParameters.Multiplier) }}
           {{- end }}
-          {{- if ne (derefUint32 $itfce.BFD.TTL) 0 }}
+          {{- if ne (derefUint32 $itfce.BFDLinkParameters.TTL) 0 }}
             ,
-            "max-hop-count": {{ (derefUint32 $itfce.BFD.TTL) }}
+            "max-hop-count": {{ (derefUint32 $itfce.BFDLinkParameters.TTL) }}
           {{- end }}
            }
         {{- end }}
@@ -585,6 +585,10 @@ data:
           "name": "{{.Name}}",
           "description": "k8s-{{.Name}}",
           "admin-state": "enable",
+          "ip-forwarding": {
+            "receive-ipv4-check": false,
+            "receive-ipv6-check": false
+          },
           "type": "{{ .Type }}",
       {{- if ne 0 (len .Interfaces)}}
           "interface": [
@@ -676,13 +680,21 @@ data:
             {{- range $index, $af := .AddressFamilies}}
               {{- if $index}},{{- end}}
                 {
-                  "afi-safi-name": "{{ $af }}",
-                  "admin-state": "enable"{{- if or (eq $af "ipv4-unicast") (eq $af "ipv6-unicast")}},{{- end }}
-              {{- if or (eq $af "ipv4-unicast") (eq $af "ipv6-unicast")}}
+                  "afi-safi-name": "{{ $af.Name }}",
+                  "admin-state": "enable"
+              {{- if or (eq $af.Name "ipv4-unicast") (eq $af.Name "ipv6-unicast")}}
+                  ,
                   "multipath": {
                     "allow-multiple-as": true,
                     "max-paths-level-1": 64,
                     "max-paths-level-2": 64
+                  }
+              {{- end }}
+              {{- if $af.RFC5549 }}
+                  ,
+                  "ipv4-unicast": {
+                    "advertise-ipv6-next-hops": true,
+                    "receive-ipv6-next-hops": true
                   }
               {{- end }}
                 }
@@ -747,7 +759,7 @@ data:
                   {{- range $index, $af := .AddressFamilies}}
                     {{- if $index}},{{- end}}
                     {
-                      "afi-safi-name": "{{ $af }}",
+                      "afi-safi-name": "{{ $af.Name }}",
                       "admin-state": "disable"
                     }
                   {{- end }}

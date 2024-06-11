@@ -405,41 +405,29 @@ spec:
                   interfaces:
                     items:
                       properties:
-                        bfd:
-                          description: BFD defines the bfd parameters of the interface
-                          properties:
-                            enabled:
-                              description: Disabled defines if bfd is disabled or
-                                not
-                              type: boolean
-                            minEchoRx:
-                              description: MinEchoRx defines the echo function timer,
-                                in msec.
-                              format: int32
-                              type: integer
-                            minRx:
-                              description: MinTx defines the required minimal interval
-                                for receiving BFD packets, in msec.
-                              format: int32
-                              type: integer
-                            minTx:
-                              description: MinTx defines the desired minimal interval
-                                for sending BFD packets, in msec.
-                              format: int32
-                              type: integer
-                            multiplier:
-                              description: Multiplier defines the number of missed
-                                packets before the session is considered down
-                              format: int32
-                              type: integer
-                            ttl:
-                              description: TTL defines the time to live on the outgoing
-                                BFD packet
-                              format: int32
-                              maximum: 255
-                              minimum: 2
-                              type: integer
-                          type: object
+                        enabled:
+                          description: Disabled defines if bfd is disabled or not
+                          type: boolean
+                        minEchoRx:
+                          description: MinEchoRx defines the echo function timer,
+                            in msec.
+                          format: int32
+                          type: integer
+                        minRx:
+                          description: MinTx defines the required minimal interval
+                            for receiving BFD packets, in msec.
+                          format: int32
+                          type: integer
+                        minTx:
+                          description: MinTx defines the desired minimal interval
+                            for sending BFD packets, in msec.
+                          format: int32
+                          type: integer
+                        multiplier:
+                          description: Multiplier defines the number of missed packets
+                            before the session is considered down
+                          format: int32
+                          type: integer
                         subInterfaceName:
                           description: SubInterfaceName defines the name and id of
                             the sub interface
@@ -453,8 +441,14 @@ spec:
                           - id
                           - name
                           type: object
+                        ttl:
+                          description: TTL defines the time to live on the outgoing
+                            BFD packet
+                          format: int32
+                          maximum: 255
+                          minimum: 2
+                          type: integer
                       required:
-                      - bfd
                       - subInterfaceName
                       type: object
                     type: array
@@ -541,7 +535,14 @@ spec:
                               description: AddressFamilies defines the address families
                                 that need to be enabled globally
                               items:
-                                type: string
+                                properties:
+                                  name:
+                                    type: string
+                                  rfc5549:
+                                    type: boolean
+                                required:
+                                - name
+                                type: object
                               type: array
                             as:
                               format: int32
@@ -614,7 +615,14 @@ spec:
                                     description: Address families define the address
                                       families to be disabled
                                     items:
-                                      type: string
+                                      properties:
+                                        name:
+                                          type: string
+                                        rfc5549:
+                                          type: boolean
+                                      required:
+                                      - name
+                                      type: object
                                     type: array
                                   bfd:
                                     type: boolean
@@ -1698,7 +1706,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.27
+        image: ghcr.io/kuidio/kuidapps:v0.0.28
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
