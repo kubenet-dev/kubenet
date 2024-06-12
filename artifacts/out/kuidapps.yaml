@@ -1509,11 +1509,11 @@ spec:
                 properties:
                   networkDesignResourceVersion:
                     type: string
-                  networkResourceVersion:
+                  networkSpecHash:
                     type: string
                 required:
                 - networkDesignResourceVersion
-                - networkResourceVersion
+                - networkSpecHash
                 type: object
             type: object
         type: object
@@ -1719,7 +1719,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.30
+        image: ghcr.io/kuidio/kuidapps:v0.0.31
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
