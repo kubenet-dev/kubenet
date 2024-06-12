@@ -1502,6 +1502,19 @@ spec:
                   - ready
                   type: object
                 type: array
+              usedReferences:
+                description: |-
+                  UsedReferences track the resource used to determine if a change to the resources was identified
+                  If a change is detected a reconcile will be triggered and the child status will be reset
+                properties:
+                  networkDesignResourceVersion:
+                    type: string
+                  networkResourceVersion:
+                    type: string
+                required:
+                - networkDesignResourceVersion
+                - networkResourceVersion
+                type: object
             type: object
         type: object
     served: true
@@ -1706,7 +1719,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.28
+        image: ghcr.io/kuidio/kuidapps:v0.0.29
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
