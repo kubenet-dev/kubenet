@@ -1106,6 +1106,9 @@ spec:
     - jsonPath: .status.conditions[?(@.type=='NetworkDeviceReady')].status
       name: DEVICES-READY
       type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].message
+      name: REASON
+      type: string
     name: v1alpha1
     schema:
       openAPIV3Schema:
@@ -1719,7 +1722,7 @@ spec:
           value: "true"
         - name: ENABLE_NETWORKDEVICE
           value: "true"
-        image: ghcr.io/kuidio/kuidapps:v0.0.31
+        image: ghcr.io/kuidio/kuidapps:v0.0.32
         imagePullPolicy: Always
         name: kuidapps
       securityContext:
