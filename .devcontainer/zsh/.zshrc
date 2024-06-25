@@ -122,7 +122,8 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias k=kubectl 
-autoload -U +X compinit && compinit
+complete -o default -F __start_kubectl k
+#autoload -U +X compinit && compinit
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 eval "$(atuin init zsh)"
