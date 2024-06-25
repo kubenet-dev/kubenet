@@ -20,6 +20,8 @@ RUN apt update && apt install -y --no-install-recommends direnv \
     dnsutils \
     telnet
 
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
 # install containerlab
 RUN bash -c "$(curl -sL https://get.containerlab.dev)"
 
