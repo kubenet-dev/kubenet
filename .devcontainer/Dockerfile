@@ -26,9 +26,7 @@ RUN apt update && apt install -y --no-install-recommends direnv \
 #    && mv kubectl /usr/local/bin/
 
 # install kind
-RUN bash -c "$(curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64)" \
-    && chmod +x kind \
-    && mv kind /usr/local/bin/
+RUN bash -c "$(curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64)" && chmod +x kind && mv kind /usr/local/bin/
 
 # install kubenetctl
 RUN bash -c "$(curl -sL https://github.com/kubenet-dev/kubenetctl/raw/main/install.sh)"
@@ -37,8 +35,7 @@ RUN bash -c "$(curl -sL https://github.com/kubenet-dev/kubenetctl/raw/main/insta
 RUN bash -c "$(curl -sL https://get.containerlab.dev)"
 
 # install gNMIc and gNOIc
-RUN bash -c "$(curl -sL https://get-gnmic.openconfig.net)" \\
-    bash -c "$(curl -sL https://get-gnoic.kmrd.dev)"
+RUN bash -c "$(curl -sL https://get-gnmic.openconfig.net)" && bash -c "$(curl -sL https://get-gnoic.kmrd.dev)"
 
 # add empty docker config files to avoid clab warnings for root user
 RUN mkdir -p /root/.docker && echo "{}" > /root/.docker/config.json
