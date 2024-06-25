@@ -20,7 +20,18 @@ RUN apt update && apt install -y --no-install-recommends direnv \
     dnsutils \
     telnet
 
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+# install kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && chmod +x kubectl \
+    && mv kubectl /usr/local/bin/
+
+# install kind
+RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64 \
+    && chmod +x kind \
+    && mv kind /usr/local/bin/
+
+# install kubenetctl
+RUN bash -c "$(curl -sL https://github.com/kubenet-dev/kubenetctl/raw/main/install.sh)"
 
 # install containerlab
 RUN bash -c "$(curl -sL https://get.containerlab.dev)"
