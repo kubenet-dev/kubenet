@@ -1,0 +1,102 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: NetworkInstance
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  generation: 2
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:interfaces:
+          k:{"endpoint":0,"id":0,"node":"node2","partition":"kubenet","port":0,"region":"region1","site":"us-east"}:
+            .: {}
+            f:endpoint: {}
+            f:id: {}
+            f:name: {}
+            f:node: {}
+            f:partition: {}
+            f:port: {}
+            f:region: {}
+            f:site: {}
+          k:{"endpoint":1,"id":0,"node":"node2","partition":"kubenet","port":1,"region":"region1","site":"us-east"}:
+            .: {}
+            f:endpoint: {}
+            f:id: {}
+            f:name: {}
+            f:node: {}
+            f:partition: {}
+            f:port: {}
+            f:region: {}
+            f:site: {}
+      f:status:
+        f:conditions:
+          k:{"type":"Ready"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: device.network.kubenet.dev.networkinstances.networkisntance
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"ecf6be81-c341-4f99-8662-af87724203fe"}: {}
+      f:spec:
+        f:id: {}
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:region: {}
+        f:site: {}
+        f:type: {}
+    manager: infra.kuid.dev.nodes.if-si-ni
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node2.default
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node2
+    uid: ecf6be81-c341-4f99-8662-af87724203fe
+  resourceVersion: "2"
+  uid: 0999db55-c179-4717-9166-1b3e605ce8a8
+spec:
+  id: 0
+  interfaces:
+  - endpoint: 0
+    id: 0
+    name: system
+    node: node2
+    partition: kubenet
+    port: 0
+    region: region1
+    site: us-east
+  - endpoint: 1
+    id: 0
+    name: interface
+    node: node2
+    partition: kubenet
+    port: 1
+    region: region1
+    site: us-east
+  name: default
+  node: node2
+  partition: kubenet
+  region: region1
+  site: us-east
+  type: default
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:37Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready

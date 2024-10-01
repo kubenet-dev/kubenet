@@ -1,0 +1,66 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: RoutingPolicy
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"ecf6be81-c341-4f99-8662-af87724203fe"}: {}
+      f:spec:
+        f:defaultAction:
+          f:result: {}
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:region: {}
+        f:site: {}
+        f:statements:
+          k:{"id":10}:
+            .: {}
+            f:action:
+              f:result: {}
+            f:id: {}
+            f:match:
+              f:prefixSetRef: {}
+          k:{"id":20}:
+            .: {}
+            f:action:
+              f:result: {}
+            f:id: {}
+            f:match:
+              f:prefixSetRef: {}
+    manager: infra.kuid.dev.nodes.routingpolicy
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.region1.us-east.node2.underlay
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node2
+    uid: ecf6be81-c341-4f99-8662-af87724203fe
+  resourceVersion: "0"
+  uid: 84effae2-164c-4a31-a8cb-ef8b951e46a5
+spec:
+  defaultAction:
+    result: reject
+  name: kubenet.region1.us-east.node2.underlay
+  node: node2
+  partition: kubenet
+  region: region1
+  site: us-east
+  statements:
+  - action:
+      result: accept
+    id: 10
+    match:
+      prefixSetRef: loopbackIPv4
+  - action:
+      result: accept
+    id: 20
+    match:
+      prefixSetRef: loopbackIPv6

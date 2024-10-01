@@ -1,0 +1,32 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: as.be.kuid.dev.asindices.star
+  resourceVersion: "0"
+  uid: a84a3dcd-f822-467c-b802-533be4dfc551
+spec:
+  code: |-
+    def getASIndex(name, namespace, spec):
+      return {
+        "apiVersion": "as.be.kuid.dev/v1alpha1",
+        "kind": "ASIndex",
+        "metadata": {
+          "name": name,
+          "namespace": namespace
+        },
+        "spec": spec
+      }
+  type: starlark
+status: {}

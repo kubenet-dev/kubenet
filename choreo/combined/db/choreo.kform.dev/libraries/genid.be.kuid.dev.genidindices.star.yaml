@@ -1,0 +1,32 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: genid.be.kuid.dev.genidindices.star
+  resourceVersion: "0"
+  uid: 9fe87c5e-0ed4-40da-9feb-1d9cc705220d
+spec:
+  code: |-
+    def getGENIDIndex(name, namespace, spec):
+      return {
+        "apiVersion": "genid.be.kuid.dev/v1alpha1",
+        "kind": "GENIDIndex",
+        "metadata": {
+          "name": name,
+          "namespace": namespace
+        },
+        "spec": spec
+      }
+  type: starlark
+status: {}

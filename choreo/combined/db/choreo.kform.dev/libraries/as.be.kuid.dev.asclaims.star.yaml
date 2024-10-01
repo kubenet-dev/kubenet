@@ -1,0 +1,30 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: as.be.kuid.dev.asclaims.star
+  resourceVersion: "0"
+  uid: 77608470-df95-478f-9a00-aa0e76bd530f
+spec:
+  code: "def getASClaimID(name, namespace):\n  resource = get_resource(\"as.be.kuid.dev/v1alpha1\",
+    \"ASClaim\")\n  rsp = client_get(name, namespace, resource[\"resource\"])\n  if
+    rsp[\"error\"] != None:\n    return None,  \"asclaim \" + name + \" err: \" +
+    rsp[\"error\"]\n    \n  if is_conditionready(rsp[\"resource\"], \"Ready\") !=
+    True:\n    return None, \"asclaim \" + name + \" not ready\"\n  status = rsp[\"resource\"].get(\"status\",
+    {})\n  return status.get(\"id\", 0), None\n\ndef getASClaim(name, namespace, spec):\n
+    \ return {\n    \"apiVersion\": \"as.be.kuid.dev/v1alpha1\",\n    \"kind\": \"ASClaim\",\n
+    \   \"metadata\": {\n        \"name\": name,\n        \"namespace\": namespace\n
+    \   },\n    \"spec\": spec,\n  }"
+  type: starlark
+status: {}

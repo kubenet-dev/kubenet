@@ -1,0 +1,41 @@
+apiVersion: ipam.be.kuid.dev/v1alpha1
+kind: IPEntry
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: ipam.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"7452d784-43b5-42f6-9ec5-9c56e9b7483f"}: {}
+      f:spec:
+        f:addressFamily: {}
+        f:claimType: {}
+        f:index: {}
+        f:labels:
+          f:infra.kuid.dev/purpose: {}
+        f:prefix: {}
+        f:prefixType: {}
+      f:status: {}
+    manager: backend
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.default.1000---64
+  namespace: default
+  ownerReferences:
+  - apiVersion: ipam.be.kuid.dev/v1alpha1
+    kind: IPClaim
+    name: kubenet.default.1000---64
+    uid: 7452d784-43b5-42f6-9ec5-9c56e9b7483f
+  resourceVersion: "0"
+  uid: 4d2651c8-7b15-49f8-959e-97b3bb2b2fcb
+spec:
+  addressFamily: ipv6
+  claimType: staticPrefix
+  index: kubenet.default
+  labels:
+    infra.kuid.dev/purpose: loopback
+  prefix: 1000::/64
+  prefixType: pool
+status: {}

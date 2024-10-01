@@ -1,0 +1,38 @@
+apiVersion: infra.kuid.dev/v1alpha1
+kind: Adaptor
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"7655f1b7-4c09-471f-b89b-f3f865f96cab"}: {}
+      f:spec:
+        f:adaptor: {}
+        f:node: {}
+        f:partition: {}
+        f:port: {}
+        f:region: {}
+        f:site: {}
+    manager: infra.kuid.dev.nodes.srlinux
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.region1.us-east.node1.1.sfp
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node1
+    uid: 7655f1b7-4c09-471f-b89b-f3f865f96cab
+  resourceVersion: "0"
+  uid: 1f50a9aa-f71b-4212-a23d-60f7a7d75e37
+spec:
+  adaptor: sfp
+  node: node1
+  partition: kubenet
+  port: 1
+  region: region1
+  site: us-east

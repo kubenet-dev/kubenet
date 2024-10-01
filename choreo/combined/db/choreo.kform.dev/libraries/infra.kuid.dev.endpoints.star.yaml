@@ -1,0 +1,38 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.endpoints.star
+  resourceVersion: "0"
+  uid: 4f27b546-7aab-45d0-bb80-63d4e06a2f04
+spec:
+  code: |-
+    load("id.kuid.dev.ids.star", "getEndpointID")
+
+    def getEndpointSpeed(endpoint):
+      epspec = endpoint.get("spec", {})
+      return epspec.get("speed", "")
+
+    def getEndpoint(name, namespace, spec):
+      return {
+        "apiVersion": "infra.kuid.dev/v1alpha1",
+        "kind": "Endpoint",
+        "metadata": {
+            "name": name,
+            "namespace": namespace,
+        },
+        "spec": spec,
+      }
+  type: starlark
+status: {}

@@ -1,0 +1,57 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.subinterfaces.bfd
+  resourceVersion: "0"
+  uid: e86ba3ab-a2d0-40e5-b40c-5496de130e2e
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"device.network.kubenet.dev.bfds.star\",
+      getNetworkBFD=\"getBFD\")\nload(\"id.kuid.dev.ids.star\", \"genEndpointIDString\")\nload(\"device.network.kubenet.dev.subinterfaces.star\",
+      \"getPartition\", getsiEPID=\"getEPID\", getsiBFDParams=\"getBFDParams\", getsiID=\"getID\")\n\nfinalizer
+      = \"subinterface.device.network.kubenet.dev/bfd\"\nconditionType = \"BFDReady\"\n\ndef
+      reconcile(self):\n  # self = si\n\n  if getDeletionTimestamp(self) != None:\n
+      \   rsp = client_delete()\n    if rsp[\"error\"] != None:\n      return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n    \n    delFinalizer(self,
+      finalizer)\n    return reconcile_result(self, False, 0, conditionType, \"\",
+      False)\n\n  setFinalizer(self, finalizer)\n        \n  bfd = getBFD(self)\n
+      \ rsp = client_create(bfd)\n  if rsp[\"error\"] != None:\n    return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n  \n  rsp = client_apply()\n
+      \ if rsp[\"error\"] != None:\n    return reconcile_result(self, True, 0, conditionType,
+      rsp[\"error\"], rsp[\"fatal\"])\n  return reconcile_result(self, False, 0, conditionType,
+      \"\", False)\n\n\ndef getBFD(self):\n  epID = getsiEPID(self)\n  bfdParams =
+      getsiBFDParams(self)\n  id = getsiID(self)\n\n  namespace = getNamespace(self)\n
+      \ name = genEndpointIDString(epID)\n\n  spec = {}\n  for key, val in epID.items():\n
+      \   spec[key] = val\n  for key, val in bfdParams.items():\n    spec[key] = val\n
+      \ spec[\"id\"] = id\n\n  return getNetworkBFD(name, namespace, spec)\n  "
+  for:
+    group: device.network.kubenet.dev
+    kind: SubInterface
+    selector: {}
+    version: v1alpha1
+  owns:
+  - group: device.network.kubenet.dev
+    kind: BFD
+    version: v1alpha1
+  type: starlark
+status: {}

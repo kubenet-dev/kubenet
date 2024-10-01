@@ -1,0 +1,269 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+  name: links.infra.kuid.dev
+spec:
+  group: infra.kuid.dev
+  names:
+    kind: Link
+    listKind: LinkList
+    plural: links
+    singular: link
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          A link represents a physical/logical connection that enables communication and data transfer
+          between 2 endpoints of a node.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: LinkSpec defines the desired state of Link
+            properties:
+              bfd:
+                description: BFD defines the BFD specific parameters on the link
+                properties:
+                  enabled:
+                    description: Disabled defines if bfd is disabled or not
+                    type: boolean
+                  minEchoRx:
+                    description: MinEchoRx defines the echo function timer, in msec.
+                    format: int32
+                    type: integer
+                  minRx:
+                    description: MinTx defines the required minimal interval for receiving
+                      BFD packets, in msec.
+                    format: int32
+                    type: integer
+                  minTx:
+                    description: MinTx defines the desired minimal interval for sending
+                      BFD packets, in msec.
+                    format: int32
+                    type: integer
+                  multiplier:
+                    description: Multiplier defines the number of missed packets before
+                      the session is considered down
+                    format: int32
+                    type: integer
+                  ttl:
+                    description: TTL defines the time to live on the outgoing BFD
+                      packet
+                    format: int32
+                    maximum: 255
+                    minimum: 2
+                    type: integer
+                type: object
+              bgp:
+                description: BGP defines the BGP specific parameters on the link
+                properties:
+                  bfd:
+                    default: true
+                    description: BFD defines if BFD is enabled for the EGP on this
+                      interface
+                    type: boolean
+                type: object
+              endpoints:
+                description: Endpoints define the 2 endpoint identifiers of the link
+                items:
+                  description: Adaptor is optional
+                  properties:
+                    adaptor:
+                      description: Adaptor defines the name of the adaptor
+                      type: string
+                    endpoint:
+                      description: Endpoint defines the name of the endpoint
+                      type: integer
+                    module:
+                      description: Module defines the module reference id
+                      type: integer
+                    moduleBay:
+                      description: ModuleBay defines the moduleBay reference id
+                      type: integer
+                    name:
+                      description: Name is used to refer to internal names of the
+                        node
+                      type: string
+                    node:
+                      description: Node defines the name of the node
+                      type: string
+                    partition:
+                      description: Partition defines the partition this resource belongs
+                        to
+                      type: string
+                    port:
+                      description: Port defines the id of the port
+                      type: integer
+                    region:
+                      description: Region defines the region of the resource
+                      type: string
+                    site:
+                      description: Site defines the site of the resource
+                      type: string
+                  required:
+                  - endpoint
+                  - node
+                  - partition
+                  - port
+                  - region
+                  - site
+                  type: object
+                maxItems: 2
+                minItems: 2
+                type: array
+                x-kubernetes-list-type: atomic
+              internal:
+                type: boolean
+              isis:
+                description: ISIS defines the ISIS specific parameters on the link
+                properties:
+                  area:
+                    description: Defines the ISIS level the link is assocaited with
+                    type: string
+                  bfd:
+                    default: true
+                    description: BFD defines if BFD is enabled for the IGP on this
+                      interface
+                    type: boolean
+                  metric:
+                    description: Metric defines the interface metric associated with
+                      the native routing topology
+                    format: int32
+                    type: integer
+                  networkType:
+                    default: pointToPoint
+                    description: Type defines the type of network
+                    enum:
+                    - pointToPoint
+                    - broadcast
+                    type: string
+                  passive:
+                    description: Passive defines if this interface is passive
+                    type: boolean
+                type: object
+              labels:
+                additionalProperties:
+                  type: string
+                description: Labels as user defined labels
+                type: object
+              ospf:
+                description: OSPF defines the OSPF specific parameters on the link
+                properties:
+                  area:
+                    description: Defines the OSPF area the link is assocaited with
+                    type: string
+                  bfd:
+                    default: true
+                    description: BFD defines if BFD is enabled for the IGP on this
+                      interface
+                    type: boolean
+                  metric:
+                    description: Metric defines the interface metric associated with
+                      the native routing topology
+                    format: int32
+                    type: integer
+                  networkType:
+                    default: pointToPoint
+                    description: Type defines the type of network
+                    enum:
+                    - pointToPoint
+                    - broadcast
+                    type: string
+                  passive:
+                    description: Passive defines if this interface is passive
+                    type: boolean
+                type: object
+            required:
+            - endpoints
+            - internal
+            type: object
+          status:
+            description: LinkStatus defines the observed state of Link
+            properties:
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: |-
+                        type of condition in CamelCase or in foo.example.com/CamelCase.
+                        ---
+                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
+                        useful (see .node.status.conditions), the ability to deconflict is important.
+                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+            type: object
+        type: object
+    served: true
+    storage: true

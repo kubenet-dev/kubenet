@@ -1,0 +1,44 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T14:44:23Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T14:44:23Z"
+  name: infra.kuid.dev.links.link-ep
+  resourceVersion: "0"
+  uid: 5baa733a-452d-46dd-a469-984d3529f250
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"infra.kuid.dev.links.star\",
+      \"getEndpoints\", \"getEndpointIDString\")\n\nfinalizer = \"link.infra.kuid.dev/ep\"\nconditionType
+      = \"Ready\"\n\ndef reconcile(self):\n  # self = link\n  namespace = getNamespace(self)\n\n
+      \ for endpoint in getEndpoints(self):\n    ep = get_resource(\"infra.kuid.dev/v1alpha1\",
+      \"Endpoint\")\n    name = getEndpointIDString(endpoint)\n    \n    rsp = client_get(name,
+      namespace, ep[\"resource\"])\n    if rsp[\"error\"] != None:\n      return reconcile_result(self,
+      True, 0, conditionType, \"endpoint \" + name + \" err: \" + rsp[\"error\"],
+      False)\n    return reconcile_result(self, False, 0, conditionType, \"\", False)\n
+      \ return reconcile_result(self, False, 0, conditionType, \"link w/o endpoints\",
+      False)"
+  for:
+    group: infra.kuid.dev
+    kind: Link
+    selector: {}
+    version: v1alpha1
+  type: starlark
+status: {}

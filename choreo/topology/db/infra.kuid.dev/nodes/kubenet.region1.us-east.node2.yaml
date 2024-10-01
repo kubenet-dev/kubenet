@@ -1,0 +1,60 @@
+apiVersion: infra.kuid.dev/v1alpha1
+kind: Node
+metadata:
+  creationTimestamp: "2024-09-09T06:12:13Z"
+  managedFields:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:conditions:
+          k:{"type":"VendorReady"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: infra.kuid.dev.nodes.srlinux
+    operation: Apply
+    time: "2024-09-09T06:12:13Z"
+  - apiVersion: infra.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"80b7d6fc-3364-4c6f-83a6-808fb43755f6"}: {}
+      f:spec:
+        f:node: {}
+        f:partition: {}
+        f:platformType: {}
+        f:provider: {}
+        f:region: {}
+        f:site: {}
+    manager: topo.kubenet.dev.topology.nodelink
+    operation: Apply
+    time: "2024-09-09T06:12:13Z"
+  name: kubenet.region1.us-east.node2
+  namespace: default
+  ownerReferences:
+  - apiVersion: topo.kubenet.dev/v1alpha1
+    controller: true
+    kind: Topology
+    name: kubenet
+    uid: 80b7d6fc-3364-4c6f-83a6-808fb43755f6
+  resourceVersion: "1"
+  uid: 507773c6-2b8c-4cd4-8aa1-5be310b1ae91
+spec:
+  node: node2
+  partition: kubenet
+  platformType: ixrd3
+  provider: srlinux.nokia.com
+  region: region1
+  site: us-east
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-09T06:12:13Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: VendorReady

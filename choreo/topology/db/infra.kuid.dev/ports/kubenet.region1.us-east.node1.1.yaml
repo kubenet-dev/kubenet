@@ -1,0 +1,36 @@
+apiVersion: infra.kuid.dev/v1alpha1
+kind: Port
+metadata:
+  creationTimestamp: "2024-09-09T06:12:13Z"
+  managedFields:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"97e77042-eb65-4b8a-afe7-bd1c97889bdd"}: {}
+      f:spec:
+        f:node: {}
+        f:partition: {}
+        f:port: {}
+        f:region: {}
+        f:site: {}
+    manager: infra.kuid.dev.nodes.srlinux
+    operation: Apply
+    time: "2024-09-09T06:12:13Z"
+  name: kubenet.region1.us-east.node1.1
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node1
+    uid: 97e77042-eb65-4b8a-afe7-bd1c97889bdd
+  resourceVersion: "0"
+  uid: c6664757-c7bf-4ba6-9c9b-68d01e0616f8
+spec:
+  node: node1
+  partition: kubenet
+  port: 1
+  region: region1
+  site: us-east

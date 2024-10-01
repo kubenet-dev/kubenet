@@ -1,0 +1,18 @@
+apiVersion: topo.kubenet.dev/v1alpha1
+kind: Topology
+metadata:
+  name: kubenet
+  namespace: default
+spec:
+  defaults:
+    provider: srlinux.nokia.com
+    region: region1
+    site: us-east
+    platformType: ixrd3
+  nodes:
+  - name: node1
+  - name: node2
+  links:
+  - endpoints:
+    - {node: node1, port: 1, endpoint: 1, adaptor: "sfp"}
+    - {node: node2, port: 1, endpoint: 1, adaptor: "sfp"}

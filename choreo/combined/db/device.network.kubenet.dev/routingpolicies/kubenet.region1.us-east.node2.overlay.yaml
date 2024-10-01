@@ -1,0 +1,40 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: RoutingPolicy
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"ecf6be81-c341-4f99-8662-af87724203fe"}: {}
+      f:spec:
+        f:defaultAction:
+          f:result: {}
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:region: {}
+        f:site: {}
+    manager: infra.kuid.dev.nodes.routingpolicy
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.region1.us-east.node2.overlay
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node2
+    uid: ecf6be81-c341-4f99-8662-af87724203fe
+  resourceVersion: "0"
+  uid: d66ae1a4-6ffd-4267-b7af-13c248ee8fb3
+spec:
+  defaultAction:
+    result: reject
+  name: kubenet.region1.us-east.node2.overlay
+  node: node2
+  partition: kubenet
+  region: region1
+  site: us-east

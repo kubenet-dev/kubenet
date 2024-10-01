@@ -1,0 +1,64 @@
+apiVersion: infra.kuid.dev/v1alpha1
+kind: Endpoint
+metadata:
+  creationTimestamp: "2024-09-09T06:12:13Z"
+  managedFields:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:conditions:
+          k:{"type":"Ready"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: infra.kuid.dev.endpoints.endpoint
+    operation: Apply
+    time: "2024-09-09T06:12:13Z"
+  - apiVersion: infra.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"507773c6-2b8c-4cd4-8aa1-5be310b1ae91"}: {}
+      f:spec:
+        f:adaptor: {}
+        f:endpoint: {}
+        f:node: {}
+        f:partition: {}
+        f:port: {}
+        f:region: {}
+        f:site: {}
+        f:speed: {}
+    manager: infra.kuid.dev.nodes.srlinux
+    operation: Apply
+    time: "2024-09-09T06:12:13Z"
+  name: kubenet.region1.us-east.node2.14.1
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node2
+    uid: 507773c6-2b8c-4cd4-8aa1-5be310b1ae91
+  resourceVersion: "1"
+  uid: bd389cd1-6c39-40fd-a2f5-319db6ec8e8c
+spec:
+  adaptor: xfp
+  endpoint: 1
+  node: node2
+  partition: kubenet
+  port: 14
+  region: region1
+  site: us-east
+  speed: 100G
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-09T06:12:13Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready

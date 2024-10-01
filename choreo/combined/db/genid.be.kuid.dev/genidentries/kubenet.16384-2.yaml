@@ -1,0 +1,33 @@
+apiVersion: genid.be.kuid.dev/v1alpha1
+kind: GENIDEntry
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: genid.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"b56c86cd-b239-4e0a-aa75-48ef821273d9"}: {}
+      f:spec:
+        f:claimType: {}
+        f:id: {}
+        f:index: {}
+      f:status: {}
+    manager: backend
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.16384-2
+  namespace: default
+  ownerReferences:
+  - apiVersion: genid.be.kuid.dev/v1alpha1
+    kind: GENIDIndex
+    name: kubenet
+    uid: b56c86cd-b239-4e0a-aa75-48ef821273d9
+  resourceVersion: "0"
+  uid: 35865b09-70c0-481f-8d6b-4ff4dc7b7bed
+spec:
+  claimType: range
+  id: 16384/2
+  index: kubenet
+status: {}

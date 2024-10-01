@@ -1,0 +1,50 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: Interface
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"64d72a34-f000-4d99-8c1b-bef2cf7cf37b"}: {}
+      f:spec:
+        f:adaptor: {}
+        f:endpoint: {}
+        f:ethernet:
+          f:speed: {}
+        f:module: {}
+        f:mtu: {}
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:port: {}
+        f:region: {}
+        f:site: {}
+    manager: infra.kuid.dev.links.link-internal-if-si
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node1.1.1
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Link
+    name: kubenet.region1.us-east.node1.1.1.node2.1.1
+    uid: 64d72a34-f000-4d99-8c1b-bef2cf7cf37b
+  resourceVersion: "0"
+  uid: 3514a733-29c7-4cda-be5b-3ee0f804f015
+spec:
+  adaptor: sfp
+  endpoint: 1
+  ethernet:
+    speed: 10G
+  module: 0
+  mtu: 9000
+  name: interface
+  node: node1
+  partition: kubenet
+  port: 1
+  region: region1
+  site: us-east

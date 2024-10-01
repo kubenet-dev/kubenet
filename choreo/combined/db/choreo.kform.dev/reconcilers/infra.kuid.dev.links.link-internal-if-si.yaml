@@ -1,0 +1,103 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.links.link-internal-if-si
+  resourceVersion: "0"
+  uid: 34ffec58-ecb6-4e87-ac54-b0b6ad7b351c
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"id.kuid.dev.ids.star\",
+      \"genEndpointIDString\")\nload(\"infra.kuid.dev.links.star\", \"getEndpoints\",
+      \"mergeBFDParameters\")\nload(\"ipam.be.kuid.dev.ipclaims.star\", \"getIPClaimedAddress\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+      \"getNetworkDesign\", \"isItfceNumbered\")\nload(\"device.network.kubenet.dev.interfaces.star\",
+      \"getInterfaceSpecWithLookup\", \"getInterface\")\nload(\"device.network.kubenet.dev.subinterfaces.star\",
+      \"getSubInterface\", \"getSubInterfaceSpec\")\n\nfinalizer = \"link.infra.kuid.dev/itfce\"\nconditionType
+      = \"InterfaceReady\"\n\ndef reconcile(self):\n  # self = link\n  namespace =
+      getNamespace(self)\n  linkName = getName(self)\n\n  if is_conditionready(self,
+      \"IPClaimReady\") != True:\n      return reconcile_result(self, True, 0, conditionType,
+      \"link ip claims not ready\", False)\n\n  # given we only deal with internal
+      links there will only be 1 network design\n  networkDesign, err = getNetworkDesignFromLink(self,
+      namespace)\n  if err != None:\n    return reconcile_result(self, False, 0, conditionType,
+      err, False)\n\n  interfaces, err = getInterfaces(self, namespace)\n  if err
+      != None:\n    return reconcile_result(self, True, 0, conditionType, err, False)\n
+      \ for itfce in interfaces:\n    rsp = client_create(itfce)\n    if rsp[\"error\"]
+      != None:\n        return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n\n  linkInfo, err = gatherLinkInfo(self, namespace, networkDesign)\n
+      \ if err != None:\n    return reconcile_result(self, True, 0, conditionType,
+      err, False)\n  \n  bfdParams = mergeBFDParameters(self, networkDesign)\n  subInterfaces
+      = getSubInterfaces(linkInfo, namespace, networkDesign, bfdParams)\n  for subItfce
+      in subInterfaces:\n    rsp = client_create(subItfce)\n    if rsp[\"error\"]
+      != None:\n        return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"]) \n  \n  rsp = client_apply()\n  if rsp[\"error\"] != None:\n
+      \   return reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n
+      \ return reconcile_result(self, False, 0, conditionType, \"\", False)\n\ndef
+      getNetworkDesignFromLink(link, namespace):\n  for endpoint in getEndpoints(link):\n
+      \   partition = endpoint.get(\"partition\", \"\")\n    return getNetworkDesign(partition,
+      namespace)\n  return None, \"not found, no endpoints\"\n\ndef getInterfaces(link,
+      namespace):\n  interfaces = []\n  for endpoint in getEndpoints(link):\n    ifName
+      = genEndpointIDString(endpoint)\n    ifSpec, err = getInterfaceSpecWithLookup(endpoint,
+      namespace)\n    if err != None:\n      return interfaces, err\n    ifSpec[\"name\"]
+      = \"interface\"\n    interfaces.append(getInterface(ifName, namespace, ifSpec))\n
+      \ return interfaces, None\n\ndef gatherLinkInfo(link, namespace, networkDesign):\n
+      \ linkInfo = []\n  for endpoint in getEndpoints(link):\n    epInfo = {}\n    for
+      key, val in endpoint.items():\n      epInfo[key] = val\n    epInfo[\"name\"]
+      = \"interface\"\n    epInfo, err = addEPInfoPerAF(epInfo, endpoint, namespace,
+      networkDesign, \"ipv4\")\n    if err != None:\n      return None, err\n    epInfo,
+      err = addEPInfoPerAF(epInfo, endpoint, namespace, networkDesign, \"ipv6\")\n
+      \   if err != None:\n      return None, err\n    linkInfo.append(epInfo)\n  return
+      linkInfo, None\n\ndef addEPInfoPerAF(epInfo, endpoint, namespace, networkDesign,
+      af):\n  if isItfceNumbered(networkDesign, \"underlay\", af):\n    ipClaimEpName
+      = genEndpointIDString(endpoint) + \".\" + af\n    address, err = getIPClaimedAddress(ipClaimEpName,
+      namespace) \n    if err != None:\n      return None, err\n    epInfo[af] = address\n
+      \ return epInfo, None\n\ndef getSubInterfaces(linkInfo, namespace, networkDesign,
+      bfdParams):\n  subinterfaces = []\n  for i in range(len(linkInfo)):\n    local
+      = linkInfo[i % 2]\n    id = 0\n    name = genEndpointIDString(local) + \".\"
+      + str(id)\n    spec = getSubInterfaceSpec(i, linkInfo, networkDesign, bfdParams,
+      id)\n    subinterfaces.append(getSubInterface(name, namespace, spec))\n  return
+      subinterfaces\n"
+  for:
+    group: infra.kuid.dev
+    kind: Link
+    selector:
+      match:
+        spec.internal: "true"
+        status.conditions.exists(c, c.type == 'IPClaimReady' && c.status == 'True'): "true"
+    version: v1alpha1
+  owns:
+  - group: device.network.kubenet.dev
+    kind: Interface
+    version: v1alpha1
+  - group: device.network.kubenet.dev
+    kind: SubInterface
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: core.network.kubenet.dev
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
+    version: v1alpha1
+status: {}

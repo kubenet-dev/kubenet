@@ -1,0 +1,32 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.prefixsets.star
+  resourceVersion: "0"
+  uid: b9246199-cbec-45b5-a98d-788cd7f308cf
+spec:
+  code: "load(\"id.kuid.dev.ids.star\", \"genNodeIDString\")\n\ndef getPrefixSet(nodeID,
+    name, namespace, prefixes):\n    name = genNodeIDString(nodeID) + \".\" + name.lower()\n
+    \   \n    spec = {}\n    spec[\"partition\"]= nodeID[\"partition\"]\n    spec[\"region\"]=
+    nodeID[\"region\"]\n    spec[\"site\"]= nodeID[\"site\"]\n    spec[\"node\"]=
+    nodeID[\"node\"]\n    spec[\"name\"]= name\n    if prefixes != None and len(prefixes)
+    > 0:\n        spec[\"prefixes\"] = prefixes\n\n    return {\n        \"apiVersion\":
+    \"device.network.kubenet.dev/v1alpha1\",\n        \"kind\": \"PrefixSet\",\n        \"metadata\":
+    {\n            \"name\": name,\n            \"namespace\": namespace,\n        },\n
+    \       \"spec\": spec,\n     }\n\ndef getPrefixSetPrefix(prefix, maskLengthRange):\n
+    \ return {\n    \"prefix\": prefix,\n    \"maskLengthRange\": maskLengthRange,\n
+    \ }"
+  type: starlark
+status: {}

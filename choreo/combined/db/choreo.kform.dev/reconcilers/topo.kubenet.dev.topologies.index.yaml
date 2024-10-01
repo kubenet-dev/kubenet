@@ -1,0 +1,60 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: topo.kubenet.dev.topologies.index
+  resourceVersion: "0"
+  uid: 236f5b45-3578-4de2-a3e4-d3dd6c3c69c6
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"as.be.kuid.dev.asindices.star\",
+      \"getASIndex\")\nload(\"genid.be.kuid.dev.genidindices.star\", getgenidGENIDIndex=\"getGENIDIndex\")\n\nfinalizer
+      = \"topology.topo.kubenet.dev/index\"\nconditionType = \"IndexReady\"\n\ndef
+      reconcile(self):\n  partition = getName(self)\n  namespace = getNamespace(self)\n\n
+      \ if getDeletionTimestamp(self) != None:\n    rsp = client_delete()\n    if
+      rsp[\"error\"] != None:\n      return reconcile_result(self, True, 0, conditionType,
+      rsp[\"error\"], rsp[\"fatal\"])\n    \n    delFinalizer(self, finalizer)\n    return
+      reconcile_result(self, False, 0, conditionType, \"\", False)\n\n  setFinalizer(self,
+      finalizer)\n\n  genidindex = getGENIDIndex(partition, namespace)\n  rsp = client_create(genidindex)\n
+      \ if rsp[\"error\"] != None:\n    return reconcile_result(self, True, 0, conditionType,
+      rsp[\"error\"], rsp[\"fatal\"])\n\n  asindex = getASIndex(partition, namespace,
+      {})\n  rsp = client_create(asindex)\n  if rsp[\"error\"] != None:\n    return
+      reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n
+      \ \n  rsp = client_apply()\n  if rsp[\"error\"] != None:\n    return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n  return reconcile_result(self,
+      False, 0, conditionType, \"\", False)\n\ndef getGENIDIndex(partition, namespace):\n
+      \ spec = {\n    \"minID\": 0,\n    \"maxID\": 4095,\n    \"type\": \"16bit\",\n
+      \ }\n  return getgenidGENIDIndex(partition, namespace, spec)\n\n\n"
+  for:
+    group: topo.kubenet.dev
+    kind: Topology
+    selector: {}
+    version: v1alpha1
+  owns:
+  - group: as.be.kuid.dev
+    kind: ASIndex
+    version: v1alpha1
+  - group: genid.be.kuid.dev
+    kind: GENIDIndex
+    version: v1alpha1
+  type: starlark
+status: {}

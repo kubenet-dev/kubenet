@@ -1,0 +1,92 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.nodes.routingpolicy
+  resourceVersion: "0"
+  uid: 46215fd5-d7af-41f3-aa14-fe6f4bf05d12
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"infra.kuid.dev.nodes.star\",
+      \"getNodeID\", \"getPartition\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+      \"getNetworkDesign\", \"isEBGPEnabled\", \"getUnderlayIPv4Prefixes\", \"getUnderlayIPv6Prefixes\")\nload(\"device.network.kubenet.dev.routingpolicies.star\",
+      \"getRoutingPolicy\", \"getRoutingPolicyStatement\")\nload(\"device.network.kubenet.dev.prefixsets.star\",
+      \"getPrefixSet\", \"getPrefixSetPrefix\")\n\nfinalizer = \"node.infra.kuid.dev/routing-policy\"\nconditionType
+      = \"RoutingPolicyReady\"\n\nloopbackPrefixListIPv4 = \"loopbackIPv4\"\nloopbackPrefixListIPv6
+      = \"loopbackIPv6\"\nunderlayPolicyName = \"underlay\"\noverlayPolicyName = \"overlay\"\n\ndef
+      reconcile(self):\n  namespace = getNamespace(self)\n  nodeName = getName(self)\n
+      \ nodeID = getNodeID(self)\n  partition = getPartition(self)\n\n  if getDeletionTimestamp(self)
+      != None:\n    rsp = client_delete()\n    if rsp[\"error\"] != None:\n      return
+      reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n
+      \   \n    delFinalizer(self, finalizer)\n    return reconcile_result(self, False,
+      0, conditionType, \"\", False)\n\n  setFinalizer(self, finalizer)\n\n  networkDesign,
+      err = getNetworkDesign(partition, namespace)\n  if err != None:\n    return
+      reconcile_result(self, False, 0, conditionType, err, False)\n\n  rps = getRoutingPolicies(nodeID,
+      namespace, networkDesign)\n  for rp in rps:\n    rsp = client_create(rp)\n    if
+      rsp[\"error\"] != None:\n      return reconcile_result(self, True, 0, conditionType,
+      rsp[\"error\"], rsp[\"fatal\"])\n\n  pss = getPrefixSets(nodeID, namespace,
+      networkDesign)\n  for ps in pss:\n    rsp = client_create(ps)\n    if rsp[\"error\"]
+      != None:\n      return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n  \n  rsp = client_apply()\n  if rsp[\"error\"] != None:\n
+      \   return reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n
+      \   \n  return reconcile_result(self, False, 0, conditionType, \"\", False)\n\ndef
+      getRoutingPolicies(nodeID, namespace, networkDesign):\n  rps = []\n  rps.append(getUnderlayRoutingPolicy(nodeID,
+      namespace, networkDesign))\n  rps.append(getOverlayRoutingPolicy(nodeID, namespace,
+      networkDesign))\n  return rps  \n\ndef getUnderlayRoutingPolicy(nodeID, namespace,
+      networkDesign):\n  statements = []\n  if isEBGPEnabled(networkDesign):\n    ipv4
+      = getUnderlayIPv4Prefixes(networkDesign)\n    if len(ipv4) > 0:\n      statements.append(getRoutingPolicyStatement(10,
+      \"accept\", loopbackPrefixListIPv4))\n    ipv6 = getUnderlayIPv6Prefixes(networkDesign)\n
+      \   if len(ipv6) > 0:\n      statements.append(getRoutingPolicyStatement(20,
+      \"accept\", loopbackPrefixListIPv6))\n  return getRoutingPolicy(nodeID, underlayPolicyName,
+      namespace, statements)\n\ndef getOverlayRoutingPolicy(nodeID, namespace, networkDesign):\n
+      \ return getRoutingPolicy(nodeID, overlayPolicyName, namespace, None)\n\ndef
+      getPrefixSets(nodeID, namespace, networkDesign):\n  prefixSets = []\n  if isEBGPEnabled(networkDesign):\n
+      \   prefixesIPv4 = getUnderlayIPv4Prefixes(networkDesign)\n    if len(prefixesIPv4)
+      > 0:\n      prefixes = []\n      for prefix in prefixesIPv4:\n        prefixes.append(getPrefixSetPrefix(prefix,
+      \"32..32\"))\n      prefixSets.append(getPrefixSet(nodeID, loopbackPrefixListIPv4,
+      namespace, prefixes))\n\n    prefixesIPv6 = getUnderlayIPv6Prefixes(networkDesign)\n
+      \   if len(prefixesIPv6) > 0:\n      prefixes = []\n      for prefix in prefixesIPv6:\n
+      \       prefixes.append(getPrefixSetPrefix(prefix, \"128..128\"))\n      prefixSets.append(getPrefixSet(nodeID,
+      loopbackPrefixListIPv6, namespace, prefixes))\n  return prefixSets\n"
+  for:
+    group: infra.kuid.dev
+    kind: Node
+    selector: {}
+    version: v1alpha1
+  owns:
+  - group: device.network.kubenet.dev
+    kind: RoutingPolicy
+    version: v1alpha1
+  - group: device.network.kubenet.dev
+    kind: PrefixSet
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: core.network.kubenet.dev
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
+    version: v1alpha1
+status: {}

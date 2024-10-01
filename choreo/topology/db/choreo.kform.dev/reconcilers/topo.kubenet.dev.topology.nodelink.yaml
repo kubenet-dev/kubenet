@@ -1,0 +1,71 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T14:44:23Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T14:44:23Z"
+  name: topo.kubenet.dev.topology.nodelink
+  resourceVersion: "0"
+  uid: 01c226b2-5e64-4789-9f93-835608e85cca
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"topo.kubenet.dev.topologies.star\",
+      \"getDefaults\", \"getNodes\", \"getNodeSpec\", \"getLinks\", \"getLinkSpec\")\nload(\"id.kuid.dev.id.star\",
+      \"getNodeKeys\", \"getNodeID\", \"genNodeIDString\")\nload(\"infra.kuid.dev.nodes.star\",
+      getInfraNode=\"getNode\")\nload(\"infra.kuid.dev.links.star\", getInfraLink=\"getLink\")\n\nfinalizer
+      = \"topology.topo.kubenet.dev/node.link\"\nconditionType = \"LinkNodeReady\"\n\ndef
+      reconcile(self):\n  # self is topo\n\n  if getDeletionTimestamp(self) != None:\n
+      \   rsp = client_delete()\n    if rsp[\"error\"] != None:\n      return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n    \n    delFinalizer(self,
+      finalizer)\n    return reconcile_result(self, False, 0, conditionType, \"\",
+      False)\n\n  setFinalizer(self, finalizer)\n\n  nodes = {}\n  defaults = getDefaults(self)\n
+      \ for topoNode in getNodes(self):\n    node, err = getNode(self, topoNode, defaults,
+      nodes)\n    if err != None:\n      return reconcile_result(self, True, 0, conditionType,
+      err, True)\n    rsp = client_create(node)\n    if rsp[\"error\"] != None:\n
+      \     return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n  \n  for topoLink in getLinks(self):\n    link, err = getLink(self,
+      topoLink, nodes)\n    if err != None:\n      return reconcile_result(self, True,
+      0, conditionType, err, True)\n    rsp = client_create(link)\n    if rsp[\"error\"]
+      != None:\n      return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n  \n  rsp = client_apply()\n  if rsp[\"error\"] != None:\n
+      \   return reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n
+      \ return reconcile_result(self, False, 0, conditionType, \"\", False)\n\ndef
+      getNode(self, topoNode, defaults, nodes):\n  partition = getName(self)\n  namespace
+      = getNamespace(self)\n\n  name, nodeSpec, err = getNodeSpec(partition, topoNode,
+      defaults)\n  if err != None:\n    return None, err\n  nodes[name] = nodeSpec\n\n
+      \ nodeName = genNodeIDString(nodeSpec)\n  spec = {}\n  for key, val in nodeSpec.items():\n
+      \   spec[key] = val\n  return getInfraNode(nodeName, namespace, spec), None\n\ndef
+      getLink(self, topoLink, nodes):\n  namespace = getNamespace(self)\n\n  name,
+      linkSpec, err = getLinkSpec(topoLink, nodes)\n  if err != None:\n    return
+      None, err\n  return getInfraLink(name, namespace, linkSpec), None"
+  for:
+    group: topo.kubenet.dev
+    kind: Topology
+    selector: {}
+    version: v1alpha1
+  owns:
+  - group: infra.kuid.dev
+    kind: Node
+    version: v1alpha1
+  - group: infra.kuid.dev
+    kind: Link
+    version: v1alpha1
+  type: starlark
+status: {}

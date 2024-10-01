@@ -1,0 +1,33 @@
+apiVersion: as.be.kuid.dev/v1alpha1
+kind: ASIndex
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: as.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"fe54f007-12a1-4a44-8d7a-5764db23732a"}: {}
+      f:spec: {}
+    manager: topo.kubenet.dev.topologies.index
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet
+  namespace: default
+  ownerReferences:
+  - apiVersion: topo.kubenet.dev/v1alpha1
+    controller: true
+    kind: Topology
+    name: kubenet
+    uid: fe54f007-12a1-4a44-8d7a-5764db23732a
+  resourceVersion: "0"
+  uid: 43d4f615-f65b-48e8-af22-86c78a2b6e6b
+spec: {}
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:36Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready

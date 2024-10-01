@@ -1,0 +1,39 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T14:44:23Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T14:44:23Z"
+  name: infra.kuid.dev.endpoints.endpoint
+  resourceVersion: "0"
+  uid: 433b7394-f227-4206-b3d8-05b2ed2def26
+spec:
+  code:
+    reconciler.star: |-
+      finalizer = "endpoint.infra.kuid.dev/ready"
+      conditionType = "Ready"
+
+      def reconcile(endpoint):
+        return reconcile_result(endpoint, False, 0, conditionType, "", False)
+  for:
+    group: infra.kuid.dev
+    kind: Endpoint
+    selector: {}
+    version: v1alpha1
+  type: starlark
+status: {}

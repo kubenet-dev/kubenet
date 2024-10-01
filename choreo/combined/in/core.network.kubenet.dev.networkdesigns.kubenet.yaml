@@ -1,0 +1,30 @@
+apiVersion: core.network.kubenet.dev/v1alpha1
+kind: NetworkDesign
+metadata:
+  name: kubenet
+  namespace: default
+spec:
+  interfaces:
+    loopback:
+      addressing: dualstack
+      prefixes:
+      - prefix: 10.0.0.0/16
+      - prefix: 1000::/64
+    underlay:
+      addressing: dualstack
+      prefixes:    
+      - prefix: 192.0.0.0/16
+      - prefix: 1192::/56
+  protocols:
+    ibgp:
+      as: 65535
+      localAS: true
+      routeReflectors:
+      - topo3nodesrl.default.core01.ipv4
+    ebgp: 
+      asPool: 65000-65100
+      bfd: true
+    bgpEVPN: {}
+  encapsulation: 
+    vxlan: {}
+  

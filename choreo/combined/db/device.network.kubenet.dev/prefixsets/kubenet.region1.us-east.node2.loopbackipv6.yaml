@@ -1,0 +1,50 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: PrefixSet
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"ecf6be81-c341-4f99-8662-af87724203fe"}: {}
+      f:spec:
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:prefixes:
+          k:{"prefix":"10.0.0.0/16"}:
+            .: {}
+            f:maskLengthRange: {}
+            f:prefix: {}
+          k:{"prefix":"1000::/64"}:
+            .: {}
+            f:maskLengthRange: {}
+            f:prefix: {}
+        f:region: {}
+        f:site: {}
+    manager: infra.kuid.dev.nodes.routingpolicy
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.region1.us-east.node2.loopbackipv6
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node2
+    uid: ecf6be81-c341-4f99-8662-af87724203fe
+  resourceVersion: "0"
+  uid: da6c77af-e05f-4773-a5cb-ce8008cfe33c
+spec:
+  name: kubenet.region1.us-east.node2.loopbackipv6
+  node: node2
+  partition: kubenet
+  prefixes:
+  - maskLengthRange: 128..128
+    prefix: 10.0.0.0/16
+  - maskLengthRange: 128..128
+    prefix: 1000::/64
+  region: region1
+  site: us-east

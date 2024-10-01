@@ -1,0 +1,64 @@
+apiVersion: topo.kubenet.dev/v1alpha1
+kind: Topology
+metadata:
+  creationTimestamp: "2024-09-08T14:44:23Z"
+  managedFields:
+  - apiVersion: topo.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:defaults:
+          f:platformType: {}
+          f:provider: {}
+          f:region: {}
+          f:site: {}
+        f:links: {}
+        f:nodes: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T14:44:23Z"
+  - apiVersion: topo.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:conditions:
+          k:{"type":"LinkNodeReady"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: topo.kubenet.dev.topology.nodelink
+    operation: Apply
+    time: "2024-09-09T06:12:13Z"
+  name: kubenet
+  namespace: default
+  resourceVersion: "1"
+  uid: 80b7d6fc-3364-4c6f-83a6-808fb43755f6
+spec:
+  defaults:
+    platformType: ixrd3
+    provider: srlinux.nokia.com
+    region: region1
+    site: us-east
+  links:
+  - endpoints:
+    - adaptor: sfp
+      endpoint: 1
+      node: node1
+      port: 1
+    - adaptor: sfp
+      endpoint: 1
+      node: node2
+      port: 1
+  nodes:
+  - name: node1
+  - name: node2
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-09T06:12:13Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: LinkNodeReady

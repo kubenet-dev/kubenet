@@ -1,0 +1,39 @@
+apiVersion: srlinux.nokia.vendor.kubenet.dev/v1alpha1
+kind: NodeTemplate
+metadata:
+  creationTimestamp: "2024-09-08T14:44:23Z"
+  managedFields:
+  - apiVersion: srlinux.nokia.vendor.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:platformType: {}
+        f:ports: {}
+        f:provider: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T14:44:23Z"
+  name: ixrd2
+  namespace: default
+  resourceVersion: "0"
+  uid: 203b20d7-9f82-482c-9a02-579580679b0f
+spec:
+  platformType: ixrd2
+  ports:
+  - adaptor:
+      connectors: 1
+      name: sfp
+      pluggable: true
+      speed: 25G
+    ids:
+      end: 48
+      start: 1
+  - adaptor:
+      connectors: 1
+      name: sfpdd
+      pluggable: true
+      speed: 100G
+    ids:
+      end: 56
+      start: 49
+  provider: srlinux.nokia.com

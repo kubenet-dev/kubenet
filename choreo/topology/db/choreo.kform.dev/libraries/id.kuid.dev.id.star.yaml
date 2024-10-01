@@ -1,0 +1,37 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T14:44:23Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T14:44:23Z"
+  name: id.kuid.dev.id.star
+  resourceVersion: "0"
+  uid: f289dd02-e780-43ca-bd8c-d4f906d90c9d
+spec:
+  code: "def getNodeID(partition, region, site, node):\n  return {\n    \"partition\":
+    partition,\n    \"region\": region,\n    \"site\": site,\n    \"node\": node,\n
+    \ }\n\ndef genNodeIDString(nodeID):\n  return nodeID[\"partition\"] + \".\" +
+    nodeID[\"region\"] + \".\" + nodeID[\"site\"] + \".\" + nodeID[\"node\"]\n\ndef
+    getEndpointID(nodeID, port, endpoint, name):\n  return {\n    \"partition\": nodeID.get(\"partition\",
+    \"\"),\n    \"region\": nodeID.get(\"region\", \"\"),\n    \"site\": nodeID.get(\"site\",
+    \"\"),\n    \"node\": nodeID.get(\"node\", \"\"),\n    \"port\": str(int(port)),\n
+    \   \"endpoint\": str(int(endpoint)),\n    \"name\": name,\n  }\n\ndef genEndpointIDString(epID):\n
+    \ nodeIDstr = genNodeIDString(epID)\n\n  epIDstr = nodeIDstr + \".\" + str(int(epID.get(\"port\",
+    0))) + \".\" + str(int(epID.get(\"endpoint\", 0)))\n  epShortName = epID.get(\"name\",
+    \"\")\n  if epShortName == \"\" or epShortName == \"interface\":\n    return epIDstr
+    \n  return epIDstr + \".\" + epShortName\n\ndef getEndpointKeys():\n  return {\n
+    \   \"partition\": True,\n    \"region\": True,\n    \"site\": True,\n    \"node\":
+    True,\n    \"port\": True,\n    \"endpoint\": True,\n    \"name\": True,\n  }\n\ndef
+    getNodeKeys():\n  return {\n    \"partition\": True,\n    \"region\": True,\n
+    \   \"site\": True,\n    \"node\": True,\n  }"
+  type: starlark
+status: {}

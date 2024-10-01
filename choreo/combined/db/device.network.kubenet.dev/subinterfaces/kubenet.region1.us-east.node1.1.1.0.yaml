@@ -1,0 +1,130 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: SubInterface
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:conditions:
+          k:{"type":"BFDReady"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: device.network.kubenet.dev.subinterfaces.bfd
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:conditions:
+          k:{"type":"BGPNeighborReady"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: device.network.kubenet.dev.subinterfaces.ebgpneighbor
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"64d72a34-f000-4d99-8c1b-bef2cf7cf37b"}: {}
+      f:spec:
+        f:adaptor: {}
+        f:endpoint: {}
+        f:id: {}
+        f:ipv4:
+          f:addresses: {}
+        f:ipv6:
+          f:addresses: {}
+        f:module: {}
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:peer:
+          f:adaptor: {}
+          f:endpoint: {}
+          f:ipv4:
+            f:addresses: {}
+          f:ipv6:
+            f:addresses: {}
+          f:module: {}
+          f:name: {}
+          f:node: {}
+          f:partition: {}
+          f:port: {}
+          f:region: {}
+          f:site: {}
+        f:port: {}
+        f:region: {}
+        f:site: {}
+        f:type: {}
+    manager: infra.kuid.dev.links.link-internal-if-si
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node1.1.1.0
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Link
+    name: kubenet.region1.us-east.node1.1.1.node2.1.1
+    uid: 64d72a34-f000-4d99-8c1b-bef2cf7cf37b
+  resourceVersion: "2"
+  uid: 01493e5a-76e5-4406-802d-7a409074c28e
+spec:
+  adaptor: sfp
+  endpoint: 1
+  id: 0
+  ipv4:
+    addresses:
+    - 192.0.0.2/31
+  ipv6:
+    addresses:
+    - 1192:0:0:1::1/64
+  module: 0
+  name: interface
+  node: node1
+  partition: kubenet
+  peer:
+    adaptor: sfp
+    endpoint: 1
+    ipv4:
+      addresses:
+      - 192.0.0.3/31
+    ipv6:
+      addresses:
+      - 1192::1:ffff:ffff:ffff:fffe/64
+    module: 0
+    name: interface
+    node: node2
+    partition: kubenet
+    port: 1
+    region: region1
+    site: us-east
+  port: 1
+  region: region1
+  site: us-east
+  type: routed
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:37Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: BFDReady
+  - lastTransitionTime: "2024-09-08T13:21:37Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: BGPNeighborReady

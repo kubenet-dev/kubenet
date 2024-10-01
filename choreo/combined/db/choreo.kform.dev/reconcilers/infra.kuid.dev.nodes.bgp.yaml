@@ -1,0 +1,97 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.nodes.bgp
+  resourceVersion: "0"
+  uid: 7449d6cc-b119-4a73-a241-0325e1a1a5d3
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"infra.kuid.dev.nodes.star\",
+      \"getPartition\", \"getNodeID\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+      \"getNetworkDesign\", \"isEBGPEnabled\", \"isIBGPEnabled\", \"isBGPEnabled\",
+      \"getPeerGroups\", \"isItfceNumbered\", \"getAddressFamilies\")\nload(\"device.network.kubenet.dev.bgpdynamicneighbors.star\",
+      getNetworkBGPDynamicNeighbor=\"getBGPDynamicNeighbor\")\nload(\"device.network.kubenet.dev.bgps.star\",
+      getNetworkBGP=\"getBGP\")\nload(\"ipam.be.kuid.dev.ipclaims.star\", \"getIPClaimedAddress\")\nload(\"as.be.kuid.dev.asclaims.star\",
+      \"getASClaimID\")\n\nfinalizer = \"node.infra.kuid.dev/bgp\"\nconditionType
+      = \"BGPReady\"\n\ndef reconcile(self):\n  # self is node\n  namespace = getNamespace(self)\n
+      \ partition = getPartition(self)\n\n  if getDeletionTimestamp(self) != None:\n
+      \   rsp = client_delete()\n    if rsp[\"error\"] != None:\n      return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n    \n    delFinalizer(self,
+      finalizer)\n    return reconcile_result(self, False, 0, conditionType, \"\",
+      False)\n\n  setFinalizer(self, finalizer)\n\n  if is_conditionready(self, \"IPClaimReady\")
+      != True:\n    return reconcile_result(self, True, 0, conditionType, \"node ip
+      claim not ready\", False)\n\n  networkDesign, err = getNetworkDesign(partition,
+      namespace)\n  if err != None:\n    return reconcile_result(self, False, 0, conditionType,
+      err, False)\n\n  if isBGPEnabled(networkDesign):\n    bgpDynNeighbor = getBGPDynamicNeighbor(self)\n
+      \   rsp = client_create(bgpDynNeighbor)\n    if rsp[\"error\"] != None:\n      return
+      reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n\n
+      \   bgp, err = getBGP(self, networkDesign)\n    if err != None:\n      return
+      reconcile_result(self, True, 0, conditionType, err, rsp[\"fatal\"])\n    rsp
+      = client_create(bgp)\n    if rsp[\"error\"] != None:\n      return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n    \n    rsp = client_apply()\n
+      \   if rsp[\"error\"] != None:\n      return reconcile_result(self, True, 0,
+      conditionType, rsp[\"error\"], rsp[\"fatal\"])\n    \n  return reconcile_result(self,
+      False, 0, conditionType, \"\", False)\n\ndef getBGPDynamicNeighbor(self):\n
+      \ name = getName(self)\n  namespace = getNamespace(self)\n\n  nodeID = getNodeID(self)\n
+      \ spec = {}\n  for key, val in nodeID.items():\n    spec[key] = val\n  \n  return
+      getNetworkBGPDynamicNeighbor(name, namespace, spec)\n\ndef getBGP(self, networkDesign):\n
+      \ name = getName(self)\n  namespace = getNamespace(self)\n  nodeID = getNodeID(self)\n\n
+      \ asn, err = getBGPAS(self, networkDesign)\n  if err != None:\n    return None,
+      err\n  \n  routerID, err = getRouterID(self, networkDesign)\n  if err != None:\n
+      \   return None, err\n\n  spec = {}\n  for key, val in nodeID.items():\n    spec[key]
+      = val\n  spec[\"as\"] = asn\n  spec[\"routerID\"] = get_address(routerID)\n
+      \ spec[\"addressFamilies\"] = getAddressFamilies(networkDesign)\n  spec[\"peerGroups\"]
+      = getPeerGroups(networkDesign)\n\n  return getNetworkBGP(name, namespace, spec),
+      None\n\ndef getBGPAS(self, networkDesign):\n  partition = getPartition(self)\n
+      \ namespace = getNamespace(self)\n  nodeName = getName(self)\n\n  asClaimName
+      = partition + \".\" + \"ibgp\"\n  if isEBGPEnabled(networkDesign):\n    asClaimName
+      = nodeName\n  return getASClaimID(asClaimName, namespace)\n\ndef getRouterID(self,
+      networkDesign):\n  namespace = getNamespace(self)\n  nodeName = getName(self)\n\n
+      \ ipClaimName = nodeName + \".\" + \"routerid\"\n  if isItfceNumbered(networkDesign,
+      \"loopback\", \"ipv4\"):\n    ipClaimName = nodeName + \".\" + \"ipv4\"\n  return
+      getIPClaimedAddress(ipClaimName, namespace)\n"
+  for:
+    group: infra.kuid.dev
+    kind: Node
+    selector:
+      match:
+        status.conditions.exists(c, c.type == 'IPClaimReady' && c.status == 'True'): "true"
+    version: v1alpha1
+  owns:
+  - group: device.network.kubenet.dev
+    kind: BGP
+    version: v1alpha1
+  - group: device.network.kubenet.dev
+    kind: BGPDynamicNeighbor
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: core.network.kubenet.dev
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
+    version: v1alpha1
+status: {}

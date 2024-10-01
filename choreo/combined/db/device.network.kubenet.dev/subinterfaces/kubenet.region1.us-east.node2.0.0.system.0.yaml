@@ -1,0 +1,96 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: SubInterface
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:conditions:
+          k:{"type":"BFDReady"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: device.network.kubenet.dev.subinterfaces.bfd
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:conditions:
+          k:{"type":"BGPNeighborReady"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: device.network.kubenet.dev.subinterfaces.ebgpneighbor
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"ecf6be81-c341-4f99-8662-af87724203fe"}: {}
+      f:spec:
+        f:endpoint: {}
+        f:id: {}
+        f:ipv4:
+          f:addresses: {}
+        f:ipv6:
+          f:addresses: {}
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:port: {}
+        f:region: {}
+        f:site: {}
+        f:type: {}
+    manager: infra.kuid.dev.nodes.if-si-ni
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node2.0.0.system.0
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node2
+    uid: ecf6be81-c341-4f99-8662-af87724203fe
+  resourceVersion: "2"
+  uid: 5f2cc9b2-6ae6-4f45-b7ed-86d06f0bff2a
+spec:
+  endpoint: 0
+  id: 0
+  ipv4:
+    addresses:
+    - 10.0.0.1/32
+  ipv6:
+    addresses:
+    - 1000::1/128
+  name: system
+  node: node2
+  partition: kubenet
+  port: 0
+  region: region1
+  site: us-east
+  type: routed
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:37Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: BFDReady
+  - lastTransitionTime: "2024-09-08T13:21:37Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: BGPNeighborReady

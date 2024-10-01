@@ -1,0 +1,32 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.ports.star
+  resourceVersion: "0"
+  uid: 4e325455-7f3f-41b5-a95a-4519655ebf0b
+spec:
+  code: |-
+    def getPort(name, namespace, spec):
+      return {
+        "apiVersion": "infra.kuid.dev/v1alpha1",
+        "kind": "Port",
+        "metadata": {
+            "name": name,
+            "namespace": namespace,
+        },
+        "spec": spec,
+      }
+  type: starlark
+status: {}

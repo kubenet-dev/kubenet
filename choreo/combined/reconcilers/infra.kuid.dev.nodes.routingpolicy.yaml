@@ -1,0 +1,24 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+# name can be inferred from the filename or from the for resource
+spec: 
+  for: 
+    group: infra.kuid.dev
+    version: v1alpha1
+    kind: Node
+    selector: {}
+  owns:
+  - group: device.network.kubenet.dev
+    version: v1alpha1
+    kind: RoutingPolicy
+  - group: device.network.kubenet.dev
+    version: v1alpha1
+    kind: PrefixSet
+  watches:
+  - group: core.network.kubenet.dev
+    version: v1alpha1
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
