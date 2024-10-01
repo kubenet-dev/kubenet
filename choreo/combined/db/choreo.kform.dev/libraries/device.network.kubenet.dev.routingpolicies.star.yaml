@@ -1,0 +1,39 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.routingpolicies.star
+  resourceVersion: "0"
+  uid: bd51559c-2dd4-4346-8d3d-9b49051952c8
+spec:
+  code: "load(\"id.kuid.dev.ids.star\", \"genNodeIDString\")\n\ndef getRoutingPolicyStatement(id,
+    actionResult, prefixSetRef = None, tagSetRef = None, family = None, protocol =
+    None, bgp = None, isis = None, ospf = None):\n  match = {}\n  if prefixSetRef
+    != None:\n    match[\"prefixSetRef\"] = prefixSetRef\n  if tagSetRef != None:\n
+    \   match[\"tagSetRef\"] = tagSetRef\n  if family != None:\n    match[\"family\"]
+    = family\n  if protocol != None:\n    match[\"protocol\"] = protocol\n  if bgp
+    != None:\n    match[\"bgp\"] = bgp\n  if ospf != None:\n    match[\"ospf\"] =
+    ospf\n  if isis != None:\n    match[\"isis\"] = isis\n  \n  return {\n    \"id\":
+    id,\n    \"match\": match,\n    \"action\": {\n        \"result\": actionResult\n
+    \   }\n  }\n\ndef getRoutingPolicy(nodeID, shortName, namespace, statements, defaultAction
+    = None):\n  name = genNodeIDString(nodeID) + \".\" + shortName.lower()\n\n  if
+    defaultAction == None:\n    defaultAction = {\"result\": \"reject\"}\n  \n  spec
+    = {}\n  for key, val in nodeID.items():\n    spec[key] = val\n  spec[\"name\"]=
+    name\n  spec[\"defaultAction\"] = defaultAction\n  if statements != None and len(statements)
+    > 0:\n    spec[\"statements\"] = statements\n\n  return {\n    \"apiVersion\":
+    \"device.network.kubenet.dev/v1alpha1\",\n    \"kind\": \"RoutingPolicy\",\n    \"metadata\":
+    {\n      \"name\": name,\n      \"namespace\": namespace,\n    },\n    \"spec\":
+    spec,\n  }"
+  type: starlark
+status: {}

@@ -1,0 +1,26 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+# name can be inferred from the filename or from the for resource
+spec: 
+  for: 
+    group: device.network.kubenet.dev
+    version: v1alpha1
+    kind: BGPDynamicNeighbor
+    selector: {}
+  watches:
+  - group: core.network.kubenet.dev
+    version: v1alpha1
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
+  - group: device.network.kubenet.dev
+    version: v1alpha1
+    kind: SubInterface
+    selector:
+      match:
+        spec.partition: spec.partition
+        spec.region: spec.region
+        spec.site: spec.site
+        spec.node: spec.node

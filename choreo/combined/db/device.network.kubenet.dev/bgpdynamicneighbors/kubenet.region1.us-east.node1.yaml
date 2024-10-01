@@ -1,0 +1,56 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: BGPDynamicNeighbor
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:conditions:
+          k:{"type":"Ready"}:
+            .: {}
+            f:lastTransitionTime: {}
+            f:message: {}
+            f:reason: {}
+            f:status: {}
+            f:type: {}
+    manager: device.network.kubenet.dev.bgpdynamicneighbors.bgpdynamicneighbor
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"7655f1b7-4c09-471f-b89b-f3f865f96cab"}: {}
+      f:spec:
+        f:node: {}
+        f:partition: {}
+        f:region: {}
+        f:site: {}
+    manager: infra.kuid.dev.nodes.bgp
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node1
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node1
+    uid: 7655f1b7-4c09-471f-b89b-f3f865f96cab
+  resourceVersion: "1"
+  uid: 4b174991-edc7-43d3-adaf-ab3936ffcfd9
+spec:
+  node: node1
+  partition: kubenet
+  region: region1
+  site: us-east
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:37Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready

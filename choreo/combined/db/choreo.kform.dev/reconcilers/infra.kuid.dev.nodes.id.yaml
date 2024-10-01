@@ -1,0 +1,93 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.nodes.id
+  resourceVersion: "0"
+  uid: d9539dea-bcc5-4ed1-956a-4365742874b2
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+      \"getNetworkDesign\", \"isEBGPEnabled\", \"isItfceNumbered\")\nload(\"infra.kuid.dev.nodes.star\",
+      \"getPartition\")\nload(\"ipam.be.kuid.dev.ipclaims.star\", \"getIPClaim\")\nload(\"as.be.kuid.dev.asclaims.star\",
+      \"getASClaim\")\n\nfinalizer = \"node.infra.kuid.dev/ids\"\nconditionType =
+      \"IPClaimReady\"\n\ndef reconcile(self):\n  namespace = getNamespace(self)\n
+      \ partition = getPartition(self)\n\n  if getDeletionTimestamp(self) != None:\n
+      \   rsp = client_delete()\n    if rsp[\"error\"] != None:\n      return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n    \n    delFinalizer(self,
+      finalizer)\n    return reconcile_result(self, False, 0, conditionType, \"\",
+      False)\n\n  setFinalizer(self, finalizer)\n\n  networkDesign, err = getNetworkDesign(partition,
+      namespace)\n  if err != None:\n    # we dont return the error but wait for the
+      network design retrigger\n    return reconcile_result(self, False, 0, conditionType,
+      err, False)\n        \n  ipClaims = getIPClaims(self, networkDesign)\n  for
+      ipClaim in ipClaims:\n    rsp = client_create(ipClaim)\n    if rsp[\"error\"]
+      != None:\n        return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n  \n  asClaims = getASClaims(self, networkDesign)\n  for asClaim
+      in asClaims:\n    rsp = client_create(asClaim)\n    if rsp[\"error\"] != None:\n
+      \       return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n\n  rsp = client_apply()\n  if rsp[\"error\"] != None:\n    return
+      reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n
+      \ return reconcile_result(self, False, 0, conditionType, \"\", False)\n  \ndef
+      getIPClaims(self, networkDesign):\n  namespace = getNamespace(self)\n  partition
+      = getPartition(self)\n  nodeName = getName(self)\n  ipIndexName = partition
+      + \".default\"\n  \n  ipClaims = []\n  # there is always an ipclaim (if ipv4
+      is not enabled a routerid is assigned)\n  af = \"ipv4\"\n  if isItfceNumbered(networkDesign,
+      \"loopback\", af):\n    ipClaimName = nodeName + \".\" + af\n    ipClaims.append(getIPClaimPerAF(ipClaimName,
+      namespace, ipIndexName, af))\n  else:\n    ipClaimName = nodeName + \".\" +
+      \"routerid\"\n    ipClaims.append(getIPClaimPerAF(ipClaimName, namespace, ipIndexName,
+      af))\n  \n  af = \"ipv6\"\n  if isItfceNumbered(networkDesign, \"loopback\",
+      af):\n    ipClaimName = nodeName + \".\" + af\n    ipClaims.append(getIPClaimPerAF(ipClaimName,
+      namespace, ipIndexName, af))\n  return ipClaims\n\ndef getIPClaimPerAF(ipClaimName,
+      namespace, ipIndexName, af):\n  spec = {\n        \"index\": ipIndexName,\n
+      \       \"prefixType\": \"pool\",\n        \"selector\": {\n          \"matchLabels\":
+      {\n            \"infra.kuid.dev/purpose\": \"loopback\",\n            \"ipam.be.kuid.dev/address-family\":
+      af,\n          },\n        }\n      }\n  return getIPClaim(ipClaimName, namespace,
+      spec)\n\ndef getASClaims(self, networkDesign):\n  nodeName = getName(self)\n
+      \ namespace = getNamespace(self)\n  partition = getPartition(self)\n  asIndexName
+      = partition \n\n  asClaims = []\n\n  if isEBGPEnabled(networkDesign):\n    spec
+      = {\n      \"index\": partition,\n      \"selector\": {\n        \"matchLabels\":
+      {\n          \"be.kuid.dev/claim-name\": partition + \".\" + \"aspool\"\n        },\n
+      \     }\n    }\n    asClaims.append(getASClaim(nodeName, namespace, spec))\n
+      \ \n  return asClaims\n"
+  for:
+    group: infra.kuid.dev
+    kind: Node
+    selector: {}
+    version: v1alpha1
+  owns:
+  - group: ipam.be.kuid.dev
+    kind: IPClaim
+    version: v1alpha1
+  - group: as.be.kuid.dev
+    kind: ASClaim
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: core.network.kubenet.dev
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
+    version: v1alpha1
+status: {}

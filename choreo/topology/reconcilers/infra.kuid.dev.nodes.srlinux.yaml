@@ -1,0 +1,35 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+# name can be inferred from the filename or from the for resource
+spec: 
+  for: 
+    group: infra.kuid.dev
+    version: v1alpha1
+    kind: Node
+    selector: 
+      match:
+        spec.provider: srlinux.nokia.com
+  owns:
+  - group: infra.kuid.dev
+    version: v1alpha1
+    kind: ModuleBay
+  - group: infra.kuid.dev
+    version: v1alpha1
+    kind: Module
+  - group: infra.kuid.dev
+    version: v1alpha1
+    kind: Port
+  - group: infra.kuid.dev
+    version: v1alpha1
+    kind: Adaptor
+  - group: infra.kuid.dev
+    version: v1alpha1
+    kind: Endpoint
+  watches:
+  - group: srlinux.nokia.vendor.kubenet.dev
+    version: v1alpha1
+    kind: NodeTemplate
+    selector:
+      match:
+        spec.provider: spec.provider
+        spec.platformType: spec.platformType

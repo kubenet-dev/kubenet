@@ -1,0 +1,33 @@
+apiVersion: as.be.kuid.dev/v1alpha1
+kind: ASEntry
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: as.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"730c51c1-9960-412f-8541-8f56c5143925"}: {}
+      f:spec:
+        f:claimType: {}
+        f:id: {}
+        f:index: {}
+      f:status: {}
+    manager: backend
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.65535-32
+  namespace: default
+  ownerReferences:
+  - apiVersion: as.be.kuid.dev/v1alpha1
+    kind: ASClaim
+    name: kubenet.ibgp
+    uid: 730c51c1-9960-412f-8541-8f56c5143925
+  resourceVersion: "0"
+  uid: ff8c594b-0e39-46f1-b4ac-4b96a5a63d24
+spec:
+  claimType: staticID
+  id: 65535/32
+  index: kubenet
+status: {}

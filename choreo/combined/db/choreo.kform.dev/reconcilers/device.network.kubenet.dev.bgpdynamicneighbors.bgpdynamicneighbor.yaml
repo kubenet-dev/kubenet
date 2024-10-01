@@ -1,0 +1,80 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.bgpdynamicneighbors.bgpdynamicneighbor
+  resourceVersion: "0"
+  uid: 38482a7e-f780-47d3-8894-3d2bf9f6bab1
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+      \"getNetworkDesign\", \"isItfceUnnumbered\")\nload(\"device.network.kubenet.dev.bgpdynamicneighbors.star\",
+      \"getPartition\", \"getRegion\", \"getSite\", \"getNode\", \"delInterfaces\",
+      \"setInterfaces\")\nload(\"device.network.kubenet.dev.subinterfaces.star\",
+      getsiEPID=\"getEPID\", getsiID=\"getID\")\n\nfinalizer = \"dynamicbgpneighbor.device.network.kubenet.dev/neighbor\"\nconditionType
+      = \"Ready\"\n\ndef reconcile(self):\n  # self is dynBGPNeighbor\n  partition
+      = getPartition(self)\n  namespace = getNamespace(self)\n  dynBGPName = getName(self)\n\n
+      \ if getDeletionTimestamp(self) != None:\n    rsp = client_delete()\n    if
+      rsp[\"error\"] != None:\n      return reconcile_result(self, True, 0, conditionType,
+      rsp[\"error\"], rsp[\"fatal\"])\n    \n    delFinalizer(self, finalizer)\n    return
+      reconcile_result(self, False, 0, conditionType, \"\", False)\n\n  setFinalizer(self,
+      finalizer)\n\n  networkDesign, err = getNetworkDesign(partition, namespace)\n
+      \ if err != None:\n    return reconcile_result(self, False, 0, conditionType,
+      err, False)\n\n  err = updateSubInterfaces(self, networkDesign)\n  if err !=
+      None:\n    return reconcile_result(self, True, 0, conditionType, err, True)\n
+      \   \n  return reconcile_result(self, False, 0, conditionType, \"\", False)\n\ndef
+      updateSubInterfaces(self, networkDesign):\n  if not isItfceUnnumbered(networkDesign,
+      \"underlay\"):\n    delInterfaces(self)\n    return None\n\n  fieldSelector
+      = {}\n  fieldSelector[\"spec.partition\"] = getPartition(self)\n  fieldSelector[\"spec.region\"]
+      = getRegion(self)\n  fieldSelector[\"spec.site\"] = getSite(self)\n  fieldSelector[\"spec.node\"]
+      = getNode(self)\n\n  silist = get_resource(\"network.kubenet.dev/v1alpha1\",
+      \"SubInterface\")\n  rsp = client_list(silist[\"resource\"], fieldSelector)\n
+      \ if rsp[\"error\"] != None:\n    return rsp[\"error\"]\n  \n  interfaces =
+      []\n  items = rsp[\"resource\"].get(\"items\", [])\n  for si in items:\n    epID
+      = getsiEPID(si)\n    interface = {}\n    for key, val in epID.items():\n      interface[key]
+      = val\n    interface[\"id\"] = getsiID(si)\n    interface[\"peerAS\"] = 0\n
+      \   interface[\"peerGroup\"] = \"underlay\"\n    interfaces.append(interface)\n\n
+      \ setInterfaces(self, interfaces)\n  return None\n"
+  for:
+    group: device.network.kubenet.dev
+    kind: BGPDynamicNeighbor
+    selector: {}
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: core.network.kubenet.dev
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
+    version: v1alpha1
+  - group: device.network.kubenet.dev
+    kind: SubInterface
+    selector:
+      match:
+        spec.node: spec.node
+        spec.partition: spec.partition
+        spec.region: spec.region
+        spec.site: spec.site
+    version: v1alpha1
+status: {}

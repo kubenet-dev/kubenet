@@ -1,0 +1,33 @@
+apiVersion: as.be.kuid.dev/v1alpha1
+kind: ASEntry
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: as.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"839acbea-322d-4f19-b6e1-f2c16a68fb52"}: {}
+      f:spec:
+        f:claimType: {}
+        f:id: {}
+        f:index: {}
+      f:status: {}
+    manager: backend
+    operation: Apply
+    time: "2024-09-09T13:58:40Z"
+  name: kubenet.aspool.65001-32
+  namespace: default
+  ownerReferences:
+  - apiVersion: as.be.kuid.dev/v1alpha1
+    kind: ASClaim
+    name: kubenet.region1.us-east.node1
+    uid: 839acbea-322d-4f19-b6e1-f2c16a68fb52
+  resourceVersion: "3"
+  uid: 70fd0635-c9ea-4ea1-bb8c-c7b2470f348a
+spec:
+  claimType: dynamicID
+  id: 65001/32
+  index: kubenet
+status: {}

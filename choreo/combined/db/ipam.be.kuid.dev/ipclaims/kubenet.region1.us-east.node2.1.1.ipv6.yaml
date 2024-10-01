@@ -1,0 +1,43 @@
+apiVersion: ipam.be.kuid.dev/v1alpha1
+kind: IPClaim
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: ipam.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"64d72a34-f000-4d99-8c1b-bef2cf7cf37b"}: {}
+      f:spec:
+        f:index: {}
+        f:prefixType: {}
+        f:selector: {}
+    manager: infra.kuid.dev.links.link-internal-id
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node2.1.1.ipv6
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Link
+    name: kubenet.region1.us-east.node1.1.1.node2.1.1
+    uid: 64d72a34-f000-4d99-8c1b-bef2cf7cf37b
+  resourceVersion: "0"
+  uid: 23f72db7-ee18-4b79-98f5-014078fefae4
+spec:
+  index: kubenet.default
+  prefixType: network
+  selector:
+    matchLabels:
+      be.kuid.dev/claim-name: kubenet.region1.us-east.node1.1.1.node2.1.1.ipv6
+      ipam.be.kuid.dev/address-family: ipv6
+status:
+  address: 1192::1:ffff:ffff:ffff:fffe/64
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:37Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready

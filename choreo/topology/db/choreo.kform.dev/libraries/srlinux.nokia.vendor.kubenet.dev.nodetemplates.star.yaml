@@ -1,0 +1,67 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T14:44:23Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T14:44:23Z"
+  name: srlinux.nokia.vendor.kubenet.dev.nodetemplates.star
+  resourceVersion: "0"
+  uid: 63f527b0-613a-4d0c-8470-b02083ba4fb9
+spec:
+  code: |-
+    def getNodeTemplate(name, namespace):
+      r = get_resource("srlinux.nokia.vendor.kubenet.dev/v1alpha1", "NodeTemplate")
+      rsp = client_get(name, namespace, r["resource"])
+      if rsp["error"] != None:
+        return None, rsp["error"]
+      return rsp["resource"], None
+
+    def getSpec(self):
+      return self.get("spec", {})
+
+    def getProvider(self):
+      spec = getSpec(self)
+      return spec.get("provider", "")
+
+    def getPlatformType(self):
+      spec = getSpec(self)
+      return spec.get("platformType", "")
+
+    def getPorts(self):
+      spec = getSpec(self)
+      return spec.get("ports", [])
+
+    def getModuleBays(self):
+      spec = getSpec(self)
+      return spec.get("moduleBays", [])
+
+    def getPortIDs(port):
+      return port.get("ids", {})
+
+    def getPortIDsStart(port):
+      portids = port.get("ids", {})
+      return portids.get("start", 0)
+
+    def getPortIDsEnd(port):
+      portids = port.get("ids", {})
+      return portids.get("end", 0)
+
+    def getPortIDsAdaptor(port):
+      portids = port.get("ids", {})
+      return port.get("adaptor", {})
+
+    def getPortIDsAdaptorConnector(port):
+      portids = port.get("ids", {})
+      adaptor = port.get("adaptor", {})
+      return adaptor.get("connectors", 1)
+  type: starlark
+status: {}

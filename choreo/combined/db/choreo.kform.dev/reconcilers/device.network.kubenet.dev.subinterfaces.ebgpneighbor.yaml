@@ -1,0 +1,87 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.subinterfaces.ebgpneighbor
+  resourceVersion: "0"
+  uid: f02432ea-f283-4edc-b1da-57a409dcd0b3
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+      \"getNetworkDesign\", \"isEBGPEnabled\")\nload(\"device.network.kubenet.dev.subinterfaces.star\",
+      \"getPartition\", \"getInterfaceName\", \"getLocalNodeID\", \"getPeerNodeID\",
+      \"getLocalAddresses\", \"getLocalAddress\", \"getPeerAddress\")\nload(\"id.kuid.dev.ids.star\",
+      \"genNodeIDString\")\nload(\"as.be.kuid.dev.asclaims.star\", \"getASClaimID\")\nload(\"device.network.kubenet.dev.bgpneighbors.star\",
+      \"getBGPNeighbor\")\n\nfinalizer = \"subinterface.kubenet.dev/bgpneighbor\"\nconditionType
+      = \"BGPNeighborReady\"\n\ndef reconcile(self):\n  partition = getPartition(self)\n
+      \ namespace = getNamespace(self)\n\n  if getDeletionTimestamp(self) != None:\n
+      \   rsp = client_delete()\n    if rsp[\"error\"] != None:\n      return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n    \n    delFinalizer(self,
+      finalizer)\n    return reconcile_result(self, False, 0, conditionType, \"\",
+      False)\n\n  setFinalizer(self, finalizer)\n\n  networkDesign, err = getNetworkDesign(partition,
+      namespace)\n  if err != None:\n    return reconcile_result(self, False, 0, conditionType,
+      err, False)\n  \n  bgpNeighbors, err = getBGPNeighbors(self, networkDesign)\n
+      \ if err != None:\n    return reconcile_result(self, True, 0, conditionType,
+      err, False)\n  for bgpNeighbor in bgpNeighbors:\n    rsp = client_create(bgpNeighbor)\n
+      \   if rsp[\"error\"] != None:\n      return reconcile_result(self, True, 0,
+      conditionType, rsp[\"error\"], rsp[\"fatal\"])\n  \n  rsp = client_apply()\n
+      \ if rsp[\"error\"] != None:\n    return reconcile_result(self, True, 0, conditionType,
+      rsp[\"error\"], rsp[\"fatal\"])\n  return reconcile_result(self, False, 0, conditionType,
+      \"\", False)\n\ndef getBGPNeighbors(self, networkDesign):\n  if not isEBGPEnabled(networkDesign):\n
+      \   return [], None\n\n  if getInterfaceName(self) == \"interface\":\n    ipv4Neighbors,
+      ipv4_err = getBGPNeighborsPerAF(self, \"ipv4\")\n    if ipv4_err:\n      return
+      None, ipv4_err\n    \n    ipv6Neighbors, ipv6_err = getBGPNeighborsPerAF(self,
+      \"ipv6\")\n    if ipv6_err:\n      return None, ipv6_err\n\n    bgpNeighbors
+      = ipv4Neighbors + ipv6Neighbors\n    return bgpNeighbors, None\n  return [],
+      None\n\ndef getBGPNeighborsPerAF(self, af):\n  namespace = getNamespace(self)\n
+      \ siName = getName(self)\n  nodeID = getLocalNodeID(self)\n\n  localNodeName
+      = genNodeIDString(nodeID)\n  peerNodeName = genNodeIDString(getPeerNodeID(self))\n
+      \ \n  localAS, err = getASClaimID(localNodeName, namespace)\n  if err != None:\n
+      \   return None, err\n  peerAS, err = getASClaimID(peerNodeName, namespace)\n
+      \ if err != None:\n    return None, err\n  \n  bgpNeighbors = []\n  for idx,
+      address in enumerate(getLocalAddresses(self, af)):\n    localAddress = getLocalAddress(self,
+      af, idx)\n    peerAddress = getPeerAddress(self, af, idx)\n    name = siName
+      + \".\" + af\n\n    spec = {}\n    for key, val in nodeID.items():\n        spec[key]
+      = val\n    spec[\"localAddress\"] = localAddress\n    spec[\"localAS\"] = localAS\n
+      \   spec[\"peerAddress\"] = peerAddress\n    spec[\"peerAS\"] = peerAS\n    spec[\"peerGroup\"]
+      = \"underlay\"\n\n    bgpNeighbors.append(getBGPNeighbor(name, namespace, spec))\n\n
+      \ return bgpNeighbors, None\n"
+  for:
+    group: device.network.kubenet.dev
+    kind: SubInterface
+    selector: {}
+    version: v1alpha1
+  owns:
+  - group: device.network.kubenet.dev
+    kind: BGPNeighbor
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: core.network.kubenet.dev
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
+    version: v1alpha1
+status: {}

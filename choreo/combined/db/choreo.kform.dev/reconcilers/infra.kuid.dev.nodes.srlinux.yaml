@@ -1,0 +1,102 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.nodes.srlinux
+  resourceVersion: "0"
+  uid: f9e57305-1d4a-44e7-a46e-6c54667c9ccb
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"infra.kuid.dev.nodes.star\",
+      \"getNodeID\", \"getPlatformType\", \"getProvider\")\nload(\"infra.kuid.dev.ports.star\",
+      getInfraPort=\"getPort\")\nload(\"infra.kuid.dev.adaptors.star\", getInfraAdaptor=\"getAdaptor\")\nload(\"infra.kuid.dev.endpoints.star\",
+      getInfraEndpoint=\"getEndpoint\")\nload(\"srlinux.nokia.vendor.kubenet.dev.nodetemplates.star\",
+      \"getNodeTemplate\", \"getPorts\", \"getPortIDsStart\", \"getPortIDsEnd\", \"getPortIDsAdaptor\",
+      \ \"getPortIDsAdaptorConnector\")\n\nfinalizer = \"node.infra.kuid.dev/nokia.srlinux\"\nconditionType
+      = \"VendorReady\"\n\ndef reconcile(self):\n  # self = node\n  name = getPlatformType(self)\n
+      \ namespace = getNamespace(self)\n\n  if getDeletionTimestamp(self) != None:\n
+      \   rsp = client_delete()\n    if rsp[\"error\"] != None:\n      return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n    \n    delFinalizer(self,
+      finalizer)\n    return reconcile_result(self, False, 0, conditionType, \"\",
+      False)\n\n  setFinalizer(self, finalizer)\n\n  nodeTemplate, err = getNodeTemplate(name,
+      namespace)\n  if err != None:\n    return reconcile_result(self, True, 0, conditionType,
+      err, False)\n          \n  for port in getPorts(nodeTemplate):\n    for portID
+      in range(int(getPortIDsStart(port)), int(getPortIDsEnd(port)) + 1):\n      rsp
+      = client_create(getPort(self, portID))\n      if rsp[\"error\"] != None:\n        return
+      reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n\n
+      \     adaptor = getAdaptor(self, portID, getPortIDsAdaptor(port))\n      rsp
+      = client_create(adaptor)\n      if rsp[\"error\"] != None:\n        return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n\n      for connectorID
+      in range(int(1), int(getPortIDsAdaptorConnector(port)) + 1):\n        ep = getEndpoint(self,
+      portID, getPortIDsAdaptor(port), connectorID)\n        rsp = client_create(ep)\n
+      \       if rsp[\"error\"] != None:\n          return reconcile_result(self,
+      True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n  \n  rsp = client_apply()\n
+      \ if rsp[\"error\"] != None:\n    return reconcile_result(self, True, 0, conditionType,
+      rsp[\"error\"], rsp[\"fatal\"])\n  return reconcile_result(self, False, 0, conditionType,
+      \"\", False)\n    \ndef getPort(node, portID):\n  namespace = getNamespace(node)\n
+      \ name = getName(node) + \".\" + str(portID)\n  nodeID = getNodeID(node)\n  spec
+      = {}\n  for key, val in nodeID.items():\n    spec[key] = val \n  spec[\"port\"]
+      = int(portID)\n  return getInfraPort(name, namespace, spec)\n\ndef getAdaptor(node,
+      portID, adaptor):\n  namespace = getNamespace(node)\n  name = getName(node)
+      + \".\" + str(portID) + \".\" + adaptor[\"name\"]\n  nodeID = getNodeID(node)\n
+      \ spec = {}\n  for key, val in nodeID.items():\n    spec[key] = val \n  spec[\"port\"]
+      = int(portID)\n  spec[\"adaptor\"] = adaptor[\"name\"]\n  return getInfraAdaptor(name,
+      namespace, spec)\n\ndef getEndpoint(node, portID, adaptor, connectorID):\n  namespace
+      = getNamespace(node)\n  name = getName(node) + \".\" + str(portID) + \".\" +
+      str(connectorID)\n  nodeID = getNodeID(node)\n  spec = {}\n  for key, val in
+      nodeID.items():\n    spec[key] = val \n  spec[\"port\"] = int(portID)\n  spec[\"adaptor\"]
+      = adaptor[\"name\"]\n  spec[\"endpoint\"] = int(connectorID)\n  spec[\"speed\"]
+      = adaptor[\"speed\"]\n  return getInfraEndpoint(name, namespace, spec)\n"
+  for:
+    group: infra.kuid.dev
+    kind: Node
+    selector:
+      match:
+        spec.provider: srlinux.nokia.com
+    version: v1alpha1
+  owns:
+  - group: infra.kuid.dev
+    kind: ModuleBay
+    version: v1alpha1
+  - group: infra.kuid.dev
+    kind: Module
+    version: v1alpha1
+  - group: infra.kuid.dev
+    kind: Port
+    version: v1alpha1
+  - group: infra.kuid.dev
+    kind: Adaptor
+    version: v1alpha1
+  - group: infra.kuid.dev
+    kind: Endpoint
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: srlinux.nokia.vendor.kubenet.dev
+    kind: NodeTemplate
+    selector:
+      match:
+        spec.platformType: spec.platformType
+        spec.provider: spec.provider
+    version: v1alpha1
+status: {}

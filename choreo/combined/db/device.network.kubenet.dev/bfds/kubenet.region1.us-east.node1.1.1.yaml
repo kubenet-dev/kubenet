@@ -1,0 +1,42 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: BFD
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"01493e5a-76e5-4406-802d-7a409074c28e"}: {}
+      f:spec:
+        f:endpoint: {}
+        f:id: {}
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:port: {}
+        f:region: {}
+        f:site: {}
+    manager: device.network.kubenet.dev.subinterfaces.bfd
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node1.1.1
+  namespace: default
+  ownerReferences:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    controller: true
+    kind: SubInterface
+    name: kubenet.region1.us-east.node1.1.1.0
+    uid: 01493e5a-76e5-4406-802d-7a409074c28e
+  resourceVersion: "0"
+  uid: a81853e6-09e1-47f8-9936-75409e2afd9f
+spec:
+  endpoint: 1
+  id: 0
+  name: interface
+  node: node1
+  partition: kubenet
+  port: 1
+  region: region1
+  site: us-east

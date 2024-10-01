@@ -1,0 +1,48 @@
+apiVersion: ipam.be.kuid.dev/v1alpha1
+kind: IPClaim
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: ipam.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"962f2030-c5e1-4ee7-b4d8-e88393938271"}: {}
+      f:spec:
+        f:createPrefix: {}
+        f:index: {}
+        f:labels:
+          f:infra.kuid.dev/purpose: {}
+        f:prefix: {}
+        f:prefixLength: {}
+        f:prefixType: {}
+    manager: core.network.kubenet.dev.networkdesigns.networkdesign
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.default.1000---64
+  namespace: default
+  ownerReferences:
+  - apiVersion: core.network.kubenet.dev/v1alpha1
+    controller: true
+    kind: NetworkDesign
+    name: kubenet
+    uid: 962f2030-c5e1-4ee7-b4d8-e88393938271
+  resourceVersion: "0"
+  uid: 7452d784-43b5-42f6-9ec5-9c56e9b7483f
+spec:
+  createPrefix: true
+  index: kubenet.default
+  labels:
+    infra.kuid.dev/purpose: loopback
+  prefix: 1000::/64
+  prefixLength: 64
+  prefixType: pool
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:36Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready
+  prefix: 1000::/64

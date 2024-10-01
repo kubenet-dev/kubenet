@@ -29,6 +29,9 @@ RUN bash -c "$(curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-am
 # install kubenetctl
 RUN bash -c "$(curl -sL https://github.com/kubenet-dev/kubenetctl/raw/main/install.sh)"
 
+# install choreoctl
+RUN bash -c "$(curl -sL https://github.com/kform-dev/choreo/raw/main/install-choreoctl.sh)"
+
 # install containerlab
 RUN bash -c "$(curl -sL https://get.containerlab.dev)"
 

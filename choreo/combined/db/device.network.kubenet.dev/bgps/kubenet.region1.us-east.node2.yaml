@@ -1,0 +1,70 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: BGP
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  generation: 3
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"ecf6be81-c341-4f99-8662-af87724203fe"}: {}
+      f:spec:
+        f:addressFamilies:
+          k:{"name":"bgpEVPN"}:
+            .: {}
+            f:name: {}
+          k:{"name":"ipv4Unicast"}:
+            .: {}
+            f:name: {}
+          k:{"name":"ipv6Unicast"}:
+            .: {}
+            f:name: {}
+        f:as: {}
+        f:node: {}
+        f:partition: {}
+        f:peerGroups:
+          k:{"name":"overlay"}:
+            .: {}
+            f:addressFamilies: {}
+            f:name: {}
+          k:{"name":"underlay"}:
+            .: {}
+            f:addressFamilies: {}
+            f:name: {}
+        f:region: {}
+        f:routerID: {}
+        f:site: {}
+    manager: infra.kuid.dev.nodes.bgp
+    operation: Apply
+    time: "2024-09-09T14:01:04Z"
+  name: kubenet.region1.us-east.node2
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node2
+    uid: ecf6be81-c341-4f99-8662-af87724203fe
+  resourceVersion: "3"
+  uid: 061e6211-bc0c-4a9b-ad5f-8fe65e2b7fee
+spec:
+  addressFamilies:
+  - name: ipv4Unicast
+  - name: ipv6Unicast
+  - name: bgpEVPN
+  as: 65000
+  node: node2
+  partition: kubenet
+  peerGroups:
+  - addressFamilies:
+    - name: ipv4Unicast
+    - name: ipv6Unicast
+    name: underlay
+  - addressFamilies:
+    - name: bgpEVPN
+    name: overlay
+  region: region1
+  routerID: 10.0.0.1
+  site: us-east

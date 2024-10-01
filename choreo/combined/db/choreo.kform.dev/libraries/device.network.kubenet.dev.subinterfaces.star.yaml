@@ -1,0 +1,65 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.subinterfaces.star
+  resourceVersion: "0"
+  uid: f9d5f9f2-870a-4608-b093-f0f9a6333a1c
+spec:
+  code: "load(\"id.kuid.dev.ids.star\", \"getNodeKeys\", \"getEndpointKeys\", \"genEndpointIDString\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+    \"isItfceIPv6Numbered\", \"isItfceIPv4Numbered\", \"isItfceIPv6UnNumbered\", \"isItfceIPv4UnNumbered\")\nload(\"device.network.kubenet.dev.bfds.star\",
+    \"getBFDParamsKeys\")\n\ndef getSpec(self):\n  return self.get(\"spec\", {})\n\ndef
+    getInterfaceName(self):\n  spec = getSpec(self)\n  return spec.get(\"name\", \"\")\n\ndef
+    getLocalAF(self, af):\n  spec = getSpec(self)\n  return spec.get(af, {})\n\ndef
+    getLocalAddresses(self, af):\n  af = getLocalAF(self, af)\n  return  af.get(\"addresses\",
+    [])\n\ndef getLocalAddress(self, af, idx):\n  addresses = getLocalAddresses(self,
+    af)\n  return get_address(addresses[idx])\n\ndef getPeerAF(self, af):\n  spec
+    = getSpec(self)\n  peer = spec.get(\"peer\", {})\n  return peer.get(af, {})\n\ndef
+    getPeerAddresses(self, af):\n  af = getPeerAF(self, af)\n  return  af.get(\"addresses\",
+    [])\n\ndef getPeerAddress(self, af, idx):\n  addresses = getPeerAddresses(self,
+    af)\n  return get_address(addresses[idx])\n\ndef getLocalNodeID(self):\n  nodeKeys
+    = getNodeKeys()\n  spec = getSpec(self)\n  nodeID = {}\n  for key, val in spec.items():\n
+    \   if key in nodeKeys:\n      nodeID[key] = val\n  return nodeID\n\ndef getPeer(self):\n
+    \ spec = getSpec(self)\n  return spec.get(\"peer\", {})\n\ndef getPeerNodeID(self):\n
+    \ nodeKeys = getNodeKeys()\n  peer = getPeer(self)\n  nodeID = {}\n  for key,
+    val in peer.items():\n    if key in nodeKeys:\n      nodeID[key] = val\n  return
+    nodeID\n\ndef getPartition(self):\n  spec = getSpec(self)\n  return spec.get(\"partition\",
+    \"\")\n\ndef getSubInterfaceSpec(idx, linkInfo, networkDesign, bfdParams, id):\n
+    \ local = linkInfo[idx % 2]\n  remote = linkInfo[(idx + 1) % 2]\n       \n  localIPv4
+    = {\"addresses\": []}\n  remoteIPv4 = {\"addresses\": []}\n  if isItfceIPv4Numbered(networkDesign,
+    \"underlay\"):\n    localIPv4[\"addresses\"].append(local.get(\"ipv4\", \"\"))\n
+    \   remoteIPv4[\"addresses\"].append(remote.get(\"ipv4\", \"\"))\n  elif isItfceIPv4UnNumbered(networkDesign,
+    \"underlay\"):\n    pass\n  else:\n    localIPv4 = None\n    remoteIPv4 = None\n
+    \       \n\n  localIPv6 = {\"addresses\": []}\n  remoteIPv6 = {\"addresses\":
+    []}\n  if isItfceIPv6Numbered(networkDesign, \"underlay\"):\n    localIPv6[\"addresses\"].append(local.get(\"ipv6\",
+    \"\"))\n    remoteIPv6[\"addresses\"].append(remote.get(\"ipv6\", \"\"))\n  elif
+    isItfceIPv6UnNumbered(networkDesign, \"underlay\"):\n    pass\n  else:\n    localIPv6
+    = None\n    remoteIPv6 = None\n\n  spec = {\n    \"id\": id,\n    \"type\": \"routed\",\n
+    \   \"ipv4\": localIPv4,\n    \"ipv6\": localIPv6,\n  }\n  for key, val in bfdParams.items():\n
+    \   spec[key] = val\n  for key, val in local.items():\n    if key == \"ipv4\"
+    or key == \"ipv6\":\n      continue\n    spec[key] = val\n\n  peer = {\n    \"ipv4\":
+    remoteIPv4,\n    \"ipv6\": remoteIPv6,\n  }\n  for key, val in remote.items():\n
+    \   if key == \"ipv4\" or key == \"ipv6\":\n      continue\n    peer[key] = val\n
+    \ spec[\"peer\"] = peer\n\n  return spec\n\ndef getspec(si):\n  return si.get(\"spec\",
+    {})\n\ndef getEPID(si):\n  epID = {}\n  epKeys = getEndpointKeys()\n  spec = getspec(si)\n
+    \ for key, val in spec.items():\n    if key in epKeys:\n      epID[key] = val\n
+    \ return epID\n\ndef getBFDParams(si):\n  bfdParams = {}\n  bfdParamsKeys = getBFDParamsKeys()\n
+    \ spec = getspec(si)\n  for key, val in spec.items():\n    if key in bfdParamsKeys:\n
+    \     bfdParams[key] = val\n  return bfdParams\n\ndef getID(si):\n  spec = getspec(si)\n
+    \ return spec.get(\"id\", 0)\n\ndef getSubInterface(name, namespace, spec):\n
+    \ return {\n    \"apiVersion\": \"device.network.kubenet.dev/v1alpha1\",\n    \"kind\":
+    \"SubInterface\",\n    \"metadata\": {\n        \"name\": name,\n        \"namespace\":
+    namespace\n    },\n    \"spec\": spec,\n  }"
+  type: starlark
+status: {}

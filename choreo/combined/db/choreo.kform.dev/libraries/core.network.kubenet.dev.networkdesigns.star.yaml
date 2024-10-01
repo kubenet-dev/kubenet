@@ -1,0 +1,109 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: core.network.kubenet.dev.networkdesigns.star
+  resourceVersion: "0"
+  uid: 29a735e2-5ce7-499a-9f5d-13336cf0ca71
+spec:
+  code: "load(\"api.k8s.io.object.star\", \"getName\")\n\ndef getNetworkDesign(partition,
+    namespace):\n    nd = get_resource(\"core.network.kubenet.dev/v1alpha1\", \"NetworkDesign\")\n
+    \   rsp = client_get(partition, namespace, nd[\"resource\"])\n    if rsp[\"error\"]
+    != None:\n        return None, rsp[\"error\"]\n    \n    if is_conditionready(rsp[\"resource\"],
+    \"Ready\") != True:\n        return None, \"network design not ready\"\n    return
+    rsp[\"resource\"], None\n      \n# addressing\n\ndef getItfce(networkDesign, interface):\n
+    \ spec = networkDesign.get(\"spec\", {})\n  interfaces = spec.get(\"interfaces\",
+    {})\n  return interfaces.get(interface, {})\n\ndef getItfceAddressing(networkDesign,
+    interface):\n  itfce = getItfce(networkDesign, interface)\n  return itfce.get(\"addressing\",
+    \"\")\n\ndef isItfceIPv4Enabled(networkDesign, interface):\n  addressing = getItfceAddressing(networkDesign,
+    interface)\n  return addressing == \"dualstack\" or addressing == \"ipv4numbered\"
+    or addressing == \"ipv4unnumbered\"\n\ndef isItfceIPv6Enabled(networkDesign, interface):\n
+    \ addressing = getItfceAddressing(networkDesign, interface)\n  return addressing
+    == \"dualstack\" or addressing == \"ipv6numbered\" or addressing == \"ipv6unnumbered\"\n\ndef
+    isItfceUnnumbered(networkDesign, interface):\n  addressing = getItfceAddressing(networkDesign,
+    interface)\n  return addressing == \"ipv4unnumbered\" or addressing == \"ipv6unnumbered\"\n\ndef
+    isItfceNumbered(networkDesign, interface, af):\n  addressing = getItfceAddressing(networkDesign,
+    interface)\n  if af == \"ipv4\":\n    return isItfceIPv4Numbered(networkDesign,
+    interface)\n  return isItfceIPv6Numbered(networkDesign, interface)\n\ndef isItfceIPv4Numbered(networkDesign,
+    interface):\n  addressing = getItfceAddressing(networkDesign, interface)\n  return
+    addressing == \"dualstack\" or addressing == \"ipv4numbered\"\n      \ndef isItfceIPv6Numbered(networkDesign,
+    interface):\n  addressing = getItfceAddressing(networkDesign, interface)\n  return
+    addressing == \"dualstack\" or addressing == \"ipv6numbered\"\n\ndef isItfceIPv4UnNumbered(networkDesign,
+    interface):\n  addressing = getItfceAddressing(networkDesign, interface)\n  return
+    addressing == \"ipv4numbered\"\n      \ndef isItfceIPv6UnNumbered(networkDesign,
+    interface):\n  addressing = getItfceAddressing(networkDesign, interface)\n  return
+    addressing == \"ipv6numbered\"\n\ndef isUnderlayIPv6Only(networkDesign):\n  addressing
+    = getItfceAddressing(networkDesign, \"underlay\")\n  return addressing == \"ipv6numbered\"
+    or addressing == \"ipv6unnumbered\"\n\ndef isUnderlayIPv4Only(networkDesign):\n
+    \ addressing = getItfceAddressing(networkDesign, \"underlay\")\n  return addressing
+    == \"ipv4numbered\" or addressing == \"ipv4unnumbered\"\n\ndef getItfcePrefixes(networkDesign,
+    interface):\n  spec = networkDesign.get(\"spec\", {})\n  interfaces = spec.get(\"interfaces\",
+    {})\n  itfce = interfaces.get(interface, {})\n  return itfce.get(\"prefixes\",
+    [])\n\ndef getUnderlayIPv4Prefixes(networkDesign):\n  prefixes = getItfcePrefixes(networkDesign,
+    \"loopback\")\n  ipv4 = []\n  for prefix in prefixes:\n    if isIPv4(prefix):\n
+    \     ipv4.append(prefix.get(\"prefix\", \"\"))\n  return ipv4\n\ndef getUnderlayIPv6Prefixes(networkDesign):\n
+    \ prefixes = getItfcePrefixes(networkDesign, \"loopback\")\n  ipv6 = []\n  for
+    prefix in prefixes:\n    if isIPv6(prefix):\n      ipv6.append(prefix.get(\"prefix\",
+    \"\"))\n  return ipv6\n\ndef getPrefixPrefix(prefix):\n  return prefix.get(\"prefix\",
+    \"\")\n\ndef getPrefixLabels(prefix, purpose):\n  labels = prefix.get(\"labels\",
+    {})\n  labels[\"infra.kuid.dev/purpose\"] = purpose\n  return labels\n\n# protocols\ndef
+    getProtocols(networkDesign):\n  spec = networkDesign.get(\"spec\", {})\n  return
+    spec.get(\"protocols\", {})\n\ndef getProtocolsISIS(networkDesign):\n  protocols
+    =  getProtocols(networkDesign)\n  return protocols.get(\"protocols\", \"isis\")\n\ndef
+    getProtocolsOSPF(networkDesign):\n  protocols =  getProtocols(networkDesign)\n
+    \ return protocols.get(\"protocols\", \"ospf\")\n\ndef getProtocolsEBGP(networkDesign):\n
+    \ protocols =  getProtocols(networkDesign)\n  return protocols.get(\"ebgp\", {})\n\ndef
+    getProtocolsIBGP(networkDesign):\n  protocols =  getProtocols(networkDesign)\n
+    \ return protocols.get(\"ibgp\", {})\n\ndef isEBGPEnabled(networkDesign):\n  ebgp
+    = getProtocolsEBGP(networkDesign)\n  return ebgp != None\n\ndef isIBGPEnabled(networkDesign):\n
+    \ ibgp = getProtocolsIBGP(networkDesign)\n  return ibgp != None\n\ndef isBGPEnabled(networkDesign):\n
+    \ return isEBGPEnabled(networkDesign) or isIBGPEnabled(networkDesign)\n\ndef isISISBFDEnabled(networkDesign):\n
+    \ isis = getProtocolsISIS(networkDesign)\n  return isis.get(\"bfd\", None) !=
+    None\n\ndef isOSPFBFDEnabled(networkDesign):\n  ospf = getProtocolsOSPF(networkDesign)\n
+    \ return ospf.get(\"bfd\", None) != None\n\ndef isEBGPBFDEnabled(networkDesign):\n
+    \ ebgp = getProtocolsEBGP(networkDesign)\n  return ebgp.get(\"bfd\", None) !=
+    None\n\ndef isBFDEnabled(networkDesign):\n  if isISISBFDEnabled(networkDesign):\n
+    \   return True\n  if isOSPFBFDEnabled(networkDesign):\n    return True\n  if
+    isEBGPBFDEnabled(networkDesign):\n    return True\n  return False\n\ndef getBFDParameters(networkDesign,
+    interface):\n  itfce = getItfce(networkDesign, interface)\n  return itfce.get(\"bfd\",
+    {})\n\ndef getIBGPASN(self):\n  ibgp = getProtocolsIBGP(self)\n  return ibgp.get(\"as\",
+    0)\n\ndef getEBGPASNPool(self):\n  ebgp = getProtocolsEBGP(self)\n  return ebgp.get(\"asPool\",
+    \"\")\n\n# address families\n\ndef getUnderlayAddressFamilies(networkDesign):\n
+    \   protocols = getProtocols(networkDesign)\n\n    afs = []\n    if isEBGPEnabled(networkDesign):\n
+    \       if isItfceIPv4Enabled(networkDesign, \"underlay\"):\n            afs.append({\"name\":
+    \"ipv4Unicast\"})\n        if isItfceIPv6Enabled(networkDesign, \"underlay\"):\n
+    \           afs.append({\"name\": \"ipv6Unicast\"})\n    return afs\n       \n\ndef
+    getOverlayAddressFamilies(networkDesign):\n    protocols = getProtocols(networkDesign)\n\n
+    \   afs = []\n    if isUnderlayIPv6Only(networkDesign) and isItfceIPv4Enabled(networkDesign,
+    \"loopback\"):\n        afs.append({\"name\": \"ipv4Unicast\", \"rfc5549\": True})
+    \ \n    # TBD do we need to add a case for underlay v4 only and v6 in overlay
+    ??\n    if protocols.get(\"bgpEVPN\", None) != None:\n        afs.append({\"name\":
+    \"bgpEVPN\"})\n    if protocols.get(\"bgpVPNv4\", None) != None:\n        afs.append({\"name\":
+    \"bgpVPNv4\"})\n    if protocols.get(\"bgpVPNv6\", None) != None:\n        afs.append({\"name\":
+    \"bgpVPNv6\"})\n    if protocols.get(\"bgpVPNv6\", None) != None:\n        afs.append({\"name\":
+    \"bgpVPNv6\"})\n    if protocols.get(\"bgpRouteTarget\", None) != None:\n        afs.append({\"name\":
+    \"bgpRouteTarget\"})\n    if protocols.get(\"bgpLabeledUnicastv4\", None) != None:\n
+    \       afs.append({\"name\": \"bgpLabeledUnicastv4\"})\n    if protocols.get(\"bgpLabeledUnicastv6\",
+    None) != None:\n        afs.append({\"name\": \"bgpLabeledUnicastv6\"})\n    return
+    afs\n\ndef getAddressFamilies(networkDesign):\n    afs = getUnderlayAddressFamilies(networkDesign)\n
+    \   afs.extend(getOverlayAddressFamilies(networkDesign))\n    return afs\n\n\ndef
+    getPeerGroups(networkDesign):\n    peerGroups = []\n    if isEBGPEnabled(networkDesign):\n
+    \       peerGroups.append(getPeerGroup(\"underlay\", getUnderlayAddressFamilies(networkDesign)))\n
+    \   peerGroups.append(getPeerGroup(\"overlay\", getOverlayAddressFamilies(networkDesign)))
+    \ \n    return peerGroups  \n\ndef getPeerGroup(name, afs):\n    return {\n        \"name\":
+    name,\n        \"addressFamilies\": afs,\n    }\n\ndef getIPIndexName(self):\n
+    \ # getName(self) -> returns network design name which is the partition\n  return
+    getName(self) + \".default\"\n"
+  type: starlark
+status: {}

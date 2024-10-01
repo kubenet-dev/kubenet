@@ -1,0 +1,39 @@
+apiVersion: genid.be.kuid.dev/v1alpha1
+kind: GENIDIndex
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: genid.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"fe54f007-12a1-4a44-8d7a-5764db23732a"}: {}
+      f:spec:
+        f:maxID: {}
+        f:minID: {}
+        f:type: {}
+    manager: topo.kubenet.dev.topologies.index
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet
+  namespace: default
+  ownerReferences:
+  - apiVersion: topo.kubenet.dev/v1alpha1
+    controller: true
+    kind: Topology
+    name: kubenet
+    uid: fe54f007-12a1-4a44-8d7a-5764db23732a
+  resourceVersion: "0"
+  uid: b56c86cd-b239-4e0a-aa75-48ef821273d9
+spec:
+  maxID: 4095
+  minID: 0
+  type: 16bit
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:36Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready

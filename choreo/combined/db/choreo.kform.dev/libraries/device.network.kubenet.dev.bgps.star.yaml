@@ -1,0 +1,39 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.bgps.star
+  resourceVersion: "0"
+  uid: 8709ddbb-5f19-41c4-98be-485d09ee5b31
+spec:
+  code: |-
+    def getSpec(self):
+      return self.get("spec", {})
+
+    def getPartition(self):
+      spec = getSpec(self)
+      return spec.get("partition", "")
+
+    def getBGP(name, namespace, spec):
+      return {
+        "apiVersion": "device.network.kubenet.dev/v1alpha1",
+        "kind": "BGP",
+        "metadata": {
+            "name": name,
+            "namespace": namespace
+        },
+        "spec": spec,
+      }
+  type: starlark
+status: {}

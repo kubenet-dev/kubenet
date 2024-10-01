@@ -1,0 +1,40 @@
+apiVersion: as.be.kuid.dev/v1alpha1
+kind: ASClaim
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: as.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"ecf6be81-c341-4f99-8662-af87724203fe"}: {}
+      f:spec:
+        f:index: {}
+        f:selector: {}
+    manager: infra.kuid.dev.nodes.id
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node2
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node2
+    uid: ecf6be81-c341-4f99-8662-af87724203fe
+  resourceVersion: "3"
+  uid: 4fff2556-99a1-4e00-9e10-7aa880400da3
+spec:
+  index: kubenet
+  selector:
+    matchLabels:
+      be.kuid.dev/claim-name: kubenet.aspool
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:37Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready
+  id: 65000

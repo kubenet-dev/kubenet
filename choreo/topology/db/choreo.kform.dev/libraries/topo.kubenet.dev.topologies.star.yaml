@@ -1,0 +1,67 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T14:44:23Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T14:44:23Z"
+  name: topo.kubenet.dev.topologies.star
+  resourceVersion: "0"
+  uid: 265bae01-b43e-48bb-a6b7-16932aaf0320
+spec:
+  code: "load(\"id.kuid.dev.id.star\", \"getNodeKeys\", \"getNodeID\")\n\ndef getSpec(self):\n
+    \ return self.get(\"spec\", {})\n\ndef getNodes(self):\n  spec = getSpec(self)\n
+    \ return spec.get(\"nodes\", [])\n\ndef getLinks(self):\n  spec = getSpec(self)\n
+    \ return spec.get(\"links\", [])\n\ndef getDefaults(self):\n  spec = getSpec(self)\n
+    \ return spec.get(\"defaults\", {})\n\ndef getNodeName(topoNode):\n  nodeName
+    = topoNode.get(\"name\", \"\")\n  if nodeName == \"\":\n    return None, \"node
+    name is missing\"\n  return nodeName, None\n\ndef getNodeProvider(topoNode, defaults):\n
+    \ return getValueWithKey(\"provider\", topoNode, defaults)\n\ndef getNodeRegion(topoNode,
+    defaults):\n  return getValueWithKey(\"region\", topoNode, defaults)\n\ndef getNodeSite(topoNode,
+    defaults):\n  return getValueWithKey(\"site\", topoNode, defaults)\n\ndef getNodePlatformType(topoNode,
+    defaults):\n  return getValueWithKey(\"platformType\", topoNode, defaults)\n\ndef
+    getValueWithKey(key, node, defaults):\n  if key in node:\n      return node[key],
+    None\n  if key in defaults:\n      return defaults[key], None\n  return None,
+    key + \"not found\"\n\ndef getNodeSpec(partition, topoNode, defaults):\n  node,
+    err = getNodeName(topoNode)\n  if err != None:\n    return None, None, err\n  region,
+    err = getNodeRegion(topoNode, defaults)\n  if err != None:\n    return None, None,
+    \"nodeName\" + node + \"err\" + err\n  site, err = getNodeSite(topoNode, defaults)\n
+    \ if err != None:\n    return None, None, \"nodeName\" + node + \"err\" + err\n
+    \ provider, err = getNodeProvider(topoNode, defaults)\n  if err != None:\n    return
+    None, None, \"nodeName\" + node + \"err\" + err\n  platformType, err = getNodePlatformType(topoNode,
+    defaults)\n  if err != None:\n    return None, None, \"nodeName\" + node + \"err\"
+    + err\n  \n  nodeSpec = getNodeID(partition, region, site, node)\n  nodeSpec[\"platformType\"]
+    = platformType\n  nodeSpec[\"provider\"] = provider\n\n  return node, nodeSpec,
+    None\n\ndef getLinkEndpoints(topoLink):\n  return topoLink.get(\"endpoints\",
+    [])\n\ndef getEndpointNode(topoEndpoint):\n  return topoEndpoint.get(\"node\",
+    \"\")\n\ndef getEndpointPort(topoEndpoint):\n  return topoEndpoint.get(\"port\",
+    0)\n\ndef getEndpointEndpoint(topoEndpoint):\n  return topoEndpoint.get(\"endpoint\",
+    0)\n\ndef getEndpointAdaptor(topoEndpoint):\n  return topoEndpoint.get(\"adaptor\",
+    \"\")\n\ndef getEndpointModuleBay(topoEndpoint):\n  return topoEndpoint.get(\"moduleBay\",
+    \"\")\n\ndef getEndpointModule(topoEndpoint):\n  return topoEndpoint.get(\"module\",
+    0)\n\ndef getLinkSpec(topoLink, nodes):\n  linkName = \"\"\n  endpoints = []\n
+    \ for topoEndpoint in getLinkEndpoints(topoLink):\n    nodeName = topoEndpoint.get(\"node\")\n
+    \   if nodeName == \"\":\n      return None, None, \"node name not present in
+    link endpoint\"\n    node = nodes.get(nodeName)\n    if not node:\n      return
+    None, None,  nodeName + \" not found in nodes\"\n        \n    endpoint = {}\n
+    \   nodeKeys = getNodeKeys()\n    for key, val in node.items():\n      if key
+    in nodeKeys:\n        endpoint[key] = val\n    endpoint[\"port\"] = getEndpointPort(topoEndpoint)\n
+    \   endpoint[\"endpoint\"] = getEndpointEndpoint(topoEndpoint)\n    endpoint[\"adaptor\"]
+    = getEndpointAdaptor(topoEndpoint)\n    if getEndpointModule(topoEndpoint) !=
+    \"\":\n      endpoint[\"module\"] = getEndpointModule(topoEndpoint)\n    if getEndpointModuleBay(topoEndpoint)
+    != \"\":\n      endpoint[\"moduleBay\"] = getEndpointModuleBay(topoEndpoint)\n
+    \   endpoints.append(endpoint)\n    if linkName == \"\":\n      linkName += node[\"partition\"]
+    + \".\" + node[\"region\"] + \".\" + node[\"site\"] + \".\"\n    else:\n      linkName
+    += \".\"\n    linkName += topoEndpoint[\"node\"] + \".\" + str(int( topoEndpoint[\"port\"]))
+    + \".\" + str(int( topoEndpoint[\"endpoint\"]))\n  \n  spec = {\n    \"internal\":
+    True,\n    \"endpoints\": endpoints\n  }\n  return linkName, spec, None\n    "
+  type: starlark
+status: {}

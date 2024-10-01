@@ -1,0 +1,25 @@
+apiVersion: srlinux.nokia.vendor.kubenet.dev/v1alpha1
+kind: NodeTemplate
+metadata:
+  name: ixrd2
+  namespace: default
+spec:
+  provider: srlinux.nokia.com
+  platformType: ixrd2
+  ports:
+  - ids:
+      start: 1
+      end: 48
+    adaptor:
+      name: sfp
+      speed: "25G"
+      pluggable: true
+      connectors: 1
+  - ids: 
+      start: 49
+      end: 56
+    adaptor:
+      name: sfpdd
+      speed: "100G"
+      pluggable: true
+      connectors: 1

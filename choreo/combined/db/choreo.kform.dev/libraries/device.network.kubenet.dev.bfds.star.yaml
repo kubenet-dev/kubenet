@@ -1,0 +1,42 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.bfds.star
+  resourceVersion: "0"
+  uid: 663328d5-3d84-4e2c-b139-e3f367bed2e6
+spec:
+  code: |-
+    def getBFD(name, namespace, spec):
+      return {
+        "apiVersion": "device.network.kubenet.dev/v1alpha1",
+        "kind": "BFD",
+        "metadata": {
+          "name": name,
+          "namespace": namespace,
+        },
+        "spec": spec,
+      }
+
+    def getBFDParamsKeys():
+      return {
+        "enabled": True,
+        "minTx": True,
+        "minRx": True,
+        "minEchoRx": True,
+        "multiplier": True,
+        "ttl": True,
+      }
+  type: starlark
+status: {}

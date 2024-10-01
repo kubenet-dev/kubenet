@@ -1,0 +1,40 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: Interface
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"7655f1b7-4c09-471f-b89b-f3f865f96cab"}: {}
+      f:spec:
+        f:endpoint: {}
+        f:name: {}
+        f:node: {}
+        f:partition: {}
+        f:port: {}
+        f:region: {}
+        f:site: {}
+    manager: infra.kuid.dev.nodes.if-si-ni
+    operation: Apply
+    time: "2024-09-08T13:21:37Z"
+  name: kubenet.region1.us-east.node1.0.0.irb
+  namespace: default
+  ownerReferences:
+  - apiVersion: infra.kuid.dev/v1alpha1
+    controller: true
+    kind: Node
+    name: kubenet.region1.us-east.node1
+    uid: 7655f1b7-4c09-471f-b89b-f3f865f96cab
+  resourceVersion: "0"
+  uid: 2c6d7b4b-f43f-43e2-9614-78a1692b816d
+spec:
+  endpoint: 0
+  name: irb
+  node: node1
+  partition: kubenet
+  port: 0
+  region: region1
+  site: us-east

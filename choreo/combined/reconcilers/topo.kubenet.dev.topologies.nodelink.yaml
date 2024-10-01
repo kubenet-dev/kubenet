@@ -1,0 +1,16 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+# name can be inferred from the filename or from the for resource
+spec: 
+  for: 
+    group: topo.kubenet.dev
+    version: v1alpha1
+    kind: Topology
+    selector: {}
+  owns:
+  - group: infra.kuid.dev
+    version: v1alpha1
+    kind: Node
+  - group: infra.kuid.dev
+    version: v1alpha1
+    kind: Link

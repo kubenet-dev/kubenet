@@ -1,0 +1,96 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.links.link-internal-id
+  resourceVersion: "0"
+  uid: 4071dbe6-d46b-4350-9830-964d6847dad3
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+      \"getNetworkDesign\", \"getIPIndexName\", \"isItfceNumbered\")\nload(\"ipam.be.kuid.dev.ipclaims.star\",
+      \"getIPClaim\")\nload(\"infra.kuid.dev.links.star\", \"getEndpoints\", \"getEndpointIDString\",
+      \"getEndpointPartition\")\n\nfinalizer = \"link.infra.kuid.dev/ids\"\nconditionType
+      = \"IPClaimReady\"\n\ndef reconcile(self):\n  # self is link\n  namespace =
+      getNamespace(self)\n\n  # given we only deal with internal links there will
+      only be 1 network design\n  networkDesign, err = getNetworkDesignFromLink(self,
+      namespace)\n  if err != None:\n    return reconcile_result(self, False, 0, conditionType,
+      err, False)\n        \n  ipClaims = getIPClaims(self, networkDesign)\n  for
+      ipClaim in ipClaims:\n    rsp = client_create(ipClaim)\n    if rsp[\"error\"]
+      != None:\n        return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n  \n  rsp = client_apply()\n  if rsp[\"error\"] != None:\n
+      \   return reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n
+      \ return reconcile_result(self, False, 0, conditionType, \"\", False)\n\n\ndef
+      getNetworkDesignFromLink(link, namespace):\n  for endpoint in getEndpoints(link):\n
+      \   partition = endpoint.get(\"partition\", \"\")\n    return getNetworkDesign(partition,
+      namespace)\n  return None, \"not found, no endpoints\"\n  \ndef getIPClaims(self,
+      networkDesign):\n  partition = getName(networkDesign)\n  ipIndexName = getIPIndexName(networkDesign)\n
+      \ linkName = getName(self)\n  namespace = getNamespace(self)\n  \n  ipClaims
+      = []\n\n  af = \"ipv4\"      \n  if isItfceNumbered(networkDesign, \"underlay\",
+      af):\n    # link claim\n    ipClaimLinkName = linkName + \".\" + af\n    ipClaim
+      = getIPPRefixClaim(ipClaimLinkName, namespace, ipIndexName, af)\n    ipClaims.append(ipClaim)\n\n
+      \   # given the order is followed we now add the endpoint claims\n    # as such
+      the link get claimed and the ips within the link will follow\n    for endpoint
+      in getEndpoints(self):\n      ipClaimEpName = getEndpointIDString(endpoint)
+      + \".\" + af\n      ipClaim = getIPAddressClaim(ipClaimEpName, namespace, ipIndexName,
+      ipClaimLinkName, af)\n      ipClaims.append(ipClaim)\n  af = \"ipv6\"\n  if
+      isItfceNumbered(networkDesign, \"underlay\", af):\n    # link claim\n    ipClaimLinkName
+      = linkName + \".\" + af\n    ipClaim = getIPPRefixClaim(ipClaimLinkName, namespace,
+      ipIndexName, af)\n    ipClaims.append(ipClaim)\n\n    # given the order is followed
+      we now add the endpoint claims\n    # as such the link get claimed and the ips
+      within the link will follow\n    for endpoint in getEndpoints(self):\n      ipClaimEpName
+      = getEndpointIDString(endpoint) + \".\" + af\n      ipClaim = getIPAddressClaim(ipClaimEpName,
+      namespace, ipIndexName, ipClaimLinkName, af)\n      ipClaims.append(ipClaim)\n
+      \ \n  return ipClaims\n\ndef getIPPRefixClaim(name, namespace, ipIndexName,
+      af):\n  prefixLength = 31\n  if af == \"ipv6\":\n    prefixLength = 64\n\n  spec
+      = {\n      \"index\": ipIndexName,\n      \"prefixType\": \"network\",\n      \"addressFamily\":
+      af,\n      \"prefixLength\": prefixLength,\n      \"createPrefix\": True,\n
+      \     \"selector\": {\n        \"matchLabels\": {\n          \"infra.kuid.dev/purpose\":
+      \"underlay\",\n          \"ipam.be.kuid.dev/address-family\": af,\n        },\n
+      \     }\n    }\n  return getIPClaim(name, namespace, spec)\n\ndef getIPAddressClaim(name,
+      namespace, ipIndexName, ipClaimLinkName, af):\n  spec = {\n      \"index\":
+      ipIndexName,\n      \"prefixType\": \"network\",\n      \"selector\": {\n        \"matchLabels\":
+      {\n          \"be.kuid.dev/claim-name\": ipClaimLinkName,\n          \"ipam.be.kuid.dev/address-family\":
+      af,\n        },\n      }\n    }\n  return getIPClaim(name, namespace, spec)\n
+      \ \n"
+  for:
+    group: infra.kuid.dev
+    kind: Link
+    selector:
+      match:
+        spec.internal: "true"
+    version: v1alpha1
+  owns:
+  - group: ipam.be.kuid.dev
+    kind: IPClaim
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: core.network.kubenet.dev
+    kind: NetworkDesign
+    selector:
+      match:
+        metadata.name: spec.partition
+        status.conditions.exists(c, c.type == 'Ready' && c.status == 'True'): "true"
+    version: v1alpha1
+status: {}

@@ -1,0 +1,84 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:owns: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: core.network.kubenet.dev.networkdesigns.networkdesign
+  resourceVersion: "0"
+  uid: 3ea09f16-6f25-4043-890a-05e2a813b858
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+      \"getIPIndexName\", \"isIBGPEnabled\", \"isEBGPEnabled\", \"getIBGPASN\", \"getEBGPASNPool\",
+      \"getItfcePrefixes\", \"getPrefixLabels\", \"getPrefixPrefix\")\nload(\"ipam.be.kuid.dev.ipclaims.star\",
+      getipamIPClaim=\"getIPClaim\")\nload(\"as.be.kuid.dev.asclaims.star\", \"getASClaim\")\n\nfinalizer
+      = \"networkdesign.core.network.kubenet.dev/ready\"\nconditionType = \"Ready\"\n\ndef
+      reconcile(self):\n  namespace = getNamespace(self)\n\n  if getDeletionTimestamp(self)
+      != None:\n    rsp = client_delete()\n    if rsp[\"error\"] != None:\n      return
+      reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n
+      \   \n    delFinalizer(self, finalizer)\n    return reconcile_result(self, False,
+      0, conditionType, \"\", False)\n\n    setFinalizer(self, finalizer)\n\n  ipIndex
+      = get_resource(\"ipam.be.kuid.dev/v1alpha1\", \"IPIndex\")\n  rsp = client_get(getIPIndexName(self),
+      namespace, ipIndex[\"resource\"])\n  if rsp[\"error\"] != None:\n      return
+      reconcile_result(self, True, 0, conditionType, rsp[\"error\"], rsp[\"fatal\"])\n\n
+      \ ipClaims = getIPClaims(self)\n  for ipClaim in ipClaims:\n    rsp = client_create(ipClaim)\n
+      \   if rsp[\"error\"] != None:\n        return reconcile_result(self, True,
+      0, conditionType, rsp[\"error\"], rsp[\"fatal\"])    \n\n  asClaims = getASClaims(self)\n
+      \ for asClaim in asClaims:\n    rsp = client_create(asClaim)\n    if rsp[\"error\"]
+      != None:\n        return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n  \n  rsp = client_apply()\n  if rsp[\"error\"] != None:\n
+      \     return reconcile_result(self, True, 0, conditionType, rsp[\"error\"],
+      rsp[\"fatal\"])\n  return reconcile_result(self, False, 0, conditionType, \"\",
+      False)\n\ndef getIPClaims(self):\n  ipClaims = []\n\n  purpose = \"loopback\"\n
+      \ for prefix in getItfcePrefixes(self, purpose):\n    ipprefix = getPrefixPrefix(prefix)\n
+      \   labels = getPrefixLabels(prefix, purpose)\n    ipClaims.append(getIPClaim(self,
+      ipprefix, \"pool\", labels))\n  \n  purpose = \"underlay\"\n  for prefix in
+      getItfcePrefixes(self, purpose):\n    ipprefix = getPrefixPrefix(prefix)\n    labels
+      = getPrefixLabels(prefix, purpose)\n    ipClaims.append(getIPClaim(self, ipprefix,
+      \"network\", labels))\n  \n  return ipClaims\n\ndef getIPClaim(self, ipprefix,
+      ipprefixType, labels):\n    ipIndexName = getIPIndexName(self)\n    namespace
+      = getNamespace(self)\n    ipClaimName = ipIndexName + \".\" + str(get_subnetname(ipprefix))\n\n
+      \   spec = {\n          \"index\": ipIndexName,\n          \"prefixType\": ipprefixType,\n
+      \         \"prefix\": ipprefix,\n          \"prefixLength\": get_prefixlength(ipprefix),\n
+      \         \"createPrefix\": True,\n          \"labels\": labels,\n        }\n
+      \   return getipamIPClaim(ipClaimName, namespace, spec)\n\ndef getASClaims(self):\n
+      \ partition = getName(self)\n  namespace = getNamespace(self)\n  asClaims =
+      []\n\n  if isIBGPEnabled(self):\n    asClaimName = partition + \".\" + \"ibgp\"\n
+      \   spec = {\n      \"index\": partition,\n      \"id\": getIBGPASN(self)\n
+      \   }\n    asClaims.append(getASClaim(asClaimName, namespace, spec))          \n\n
+      \ if isEBGPEnabled(self):\n    asClaimName = partition + \".\" + \"aspool\"\n
+      \   spec = {\n      \"index\": partition,\n      \"range\": getEBGPASNPool(self)\n
+      \   }\n    asClaims.append(getASClaim(asClaimName, namespace, spec))   \n  return
+      asClaims\n"
+  for:
+    group: core.network.kubenet.dev
+    kind: NetworkDesign
+    selector: {}
+    version: v1alpha1
+  owns:
+  - group: ipam.be.kuid.dev
+    kind: IPClaim
+    version: v1alpha1
+  - group: as.be.kuid.dev
+    kind: ASClaim
+    version: v1alpha1
+  type: starlark
+status: {}

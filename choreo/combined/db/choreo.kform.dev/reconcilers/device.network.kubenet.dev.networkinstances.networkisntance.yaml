@@ -1,0 +1,71 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Reconciler
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code:
+          f:reconciler.star: {}
+        f:for:
+          f:group: {}
+          f:kind: {}
+          f:selector: {}
+          f:version: {}
+        f:type: {}
+        f:watches: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: device.network.kubenet.dev.networkinstances.networkisntance
+  resourceVersion: "0"
+  uid: 421d43a7-7c48-4c7d-acf7-245339c384d1
+spec:
+  code:
+    reconciler.star: "load(\"api.k8s.io.object.star\", \"getName\", \"getNamespace\",
+      \"getDeletionTimestamp\", \"delFinalizer\", \"setFinalizer\")\nload(\"device.network.kubenet.dev.subinterfaces.star\",
+      getsiEPID=\"getEPID\", getsiID=\"getID\")\nload(\"device.network.kubenet.dev.networkinstances.star\",
+      \"getPartition\", \"getRegion\", \"getSite\", \"getNode\", \"setInterfaces\")\n\nfinalizer
+      = \"networkinstance.device.network.kubenet.dev/subinterface\"\nconditionType
+      = \"Ready\"\n\ndef reconcile(self):\n  namespace = getNamespace(self)\n  niName
+      = getName(self)\n\n  err = updateSubInterfaces(self, namespace)\n  if err !=
+      None:\n    return reconcile_result(self, True, 0, conditionType, err, True)\n\n
+      \ return reconcile_result(self, False, 0, conditionType, \"\", False)\n\ndef
+      updateSubInterfaces(self, namespace):\n  fieldSelector = {}\n  fieldSelector[\"spec.partition\"]
+      = getPartition(self)\n  fieldSelector[\"spec.region\"] = getRegion(self)\n  fieldSelector[\"spec.site\"]
+      = getSite(self)\n  fieldSelector[\"spec.node\"] = getNode(self)\n\n  silist
+      = get_resource(\"device.network.kubenet.dev/v1alpha1\", \"SubInterface\")\n
+      \ rsp = client_list(silist[\"resource\"], fieldSelector)\n  if rsp[\"error\"]
+      != None:\n    return rsp[\"error\"]\n  \n  interfaces = []\n  items = rsp[\"resource\"].get(\"items\",
+      [])\n  for si in items:\n    epID = getsiEPID(si)\n    interface = {}\n    for
+      key, val in epID.items():\n      interface[key] = val\n    interface[\"id\"]
+      = getsiID(si)\n\n    interfaces.append(interface)\n  \n  # Sort interfaces by
+      multiple keys\n  interfaces = insertion_sort(interfaces, lambda x: (x.get('id'),
+      x.get('endpoint'), x.get('port'), x.get('name')))\n\n  setInterfaces(self, interfaces)\n
+      \ return None\n\ndef insertion_sort(arr, key_func):\n  for i in range(1, len(arr)):\n
+      \   key_item = arr[i]\n    key_value = key_func(key_item)\n    # Insert key_item
+      into the sorted sequence arr[0 ... i-1]\n    inserted = False\n    for j in
+      range(i - 1, -1, -1):\n      if key_func(arr[j]) > key_value:\n        arr[j
+      + 1] = arr[j]\n      else:\n        arr[j + 1] = key_item\n        inserted
+      = True\n        break\n    if not inserted:\n      arr[0] = key_item\n  return
+      arr\n\n\n"
+  for:
+    group: device.network.kubenet.dev
+    kind: NetworkInstance
+    selector: {}
+    version: v1alpha1
+  type: starlark
+  watches:
+  - group: device.network.kubenet.dev
+    kind: SubInterface
+    selector:
+      match:
+        spec.node: spec.node
+        spec.partition: spec.partition
+        spec.region: spec.region
+        spec.site: spec.site
+    version: v1alpha1
+status: {}

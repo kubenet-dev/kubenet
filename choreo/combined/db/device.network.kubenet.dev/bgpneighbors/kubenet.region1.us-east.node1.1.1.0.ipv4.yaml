@@ -1,0 +1,45 @@
+apiVersion: device.network.kubenet.dev/v1alpha1
+kind: BGPNeighbor
+metadata:
+  creationTimestamp: "2024-09-08T13:21:37Z"
+  generation: 3
+  managedFields:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"01493e5a-76e5-4406-802d-7a409074c28e"}: {}
+      f:spec:
+        f:localAS: {}
+        f:localAddress: {}
+        f:node: {}
+        f:partition: {}
+        f:peerAS: {}
+        f:peerAddress: {}
+        f:peerGroup: {}
+        f:region: {}
+        f:site: {}
+    manager: device.network.kubenet.dev.subinterfaces.ebgpneighbor
+    operation: Apply
+    time: "2024-09-09T14:01:04Z"
+  name: kubenet.region1.us-east.node1.1.1.0.ipv4
+  namespace: default
+  ownerReferences:
+  - apiVersion: device.network.kubenet.dev/v1alpha1
+    controller: true
+    kind: SubInterface
+    name: kubenet.region1.us-east.node1.1.1.0
+    uid: 01493e5a-76e5-4406-802d-7a409074c28e
+  resourceVersion: "3"
+  uid: 9e1e450a-f665-4dae-baa0-36f248a7c1fd
+spec:
+  localAS: 65001
+  localAddress: 192.0.0.2
+  node: node1
+  partition: kubenet
+  peerAS: 65000
+  peerAddress: 192.0.0.3
+  peerGroup: underlay
+  region: region1
+  site: us-east

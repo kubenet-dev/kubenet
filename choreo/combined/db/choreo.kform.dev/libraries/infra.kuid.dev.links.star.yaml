@@ -1,0 +1,52 @@
+apiVersion: choreo.kform.dev/v1alpha1
+kind: Library
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: choreo.kform.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:code: {}
+        f:type: {}
+      f:status: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: infra.kuid.dev.links.star
+  resourceVersion: "0"
+  uid: 89c2fd8c-9545-4354-84d1-c4eb40921a78
+spec:
+  code: "load(\"id.kuid.dev.ids.star\", \"getNodeKeys\", getidEndpointID=\"getEndpointID\",
+    \"genEndpointIDString\")\nload(\"core.network.kubenet.dev.networkdesigns.star\",
+    getNetworkDesignBFDParameters=\"getBFDParameters\")\n\ndef getSpec(self):\n  return
+    self.get(\"spec\", {})\n\ndef getEndpoints(self):\n  spec = getSpec(self)\n  return
+    spec.get(\"endpoints\", [])\n\ndef getBFDParameters(self):\n  spec = getSpec(self)\n
+    \ return spec.get(\"bfd\", {})\n\ndef mergeBFDParameters(link, networkDesign):\n
+    \ linkBFDParams = getBFDParameters(link)\n  ndBFDParams = getNetworkDesignBFDParameters(networkDesign,
+    \"underlay\")\n\n  mergedParams = {}\n  # Union the keys from both dictionaries\n
+    \ all_keys = union_of_keys(linkBFDParams, ndBFDParams)\n  \n  # Iterate over all
+    unique keys\n  for key in all_keys:\n    if key in linkBFDParams and linkBFDParams[key]
+    != None:\n      mergedParams[key] = linkBFDParams[key]\n    elif key in ndBFDParams
+    and ndBFDParams[key] != None:  # 2nd priority\n      mergedParams[key] = ndBFDParams[key]\n
+    \   # If the key is not in dict1 or it's None in dict1, and it's None in dict2,
+    skip it\n  return mergedParams  \n    \ndef union_of_keys(dict1, dict2):\n  temp_dict
+    = {}\n  for key in dict1.keys():\n    temp_dict[key] = True\n  for key in dict2.keys():\n
+    \   temp_dict[key] = True\n  return list(temp_dict.keys())\n\ndef getEndpointPartition(endpoint):\n
+    \ return endpoint.get(\"partition\", \"\")\n\ndef getEndpointRegion(endpoint):\n
+    \ return endpoint.get(\"region\", \"\")\n\ndef getEndpointSite(endpoint):\n  return
+    endpoint.get(\"site\", \"\")\n\ndef getEndpointNode(endpoint):\n  return endpoint.get(\"node\",
+    \"\")\n\ndef getEndpointPort(endpoint):\n  return endpoint.get(\"port\", 0)\n\ndef
+    getEndpointEndpoint(endpoint):\n  return endpoint.get(\"endpoint\", 0)\n\ndef
+    getEndpointModule(endpoint):\n  return endpoint.get(\"module\", 0)\n\ndef getEndpointModuleBay(endpoint):\n
+    \ return endpoint.get(\"moduleBay\", 0)\n\ndef getEndpointNodeID(endpoint):\n
+    \ nodeKeys = getNodeKeys()\n  nodeID = {}\n  for key, val in endpoint.items():\n
+    \   if key in nodeKeys:\n      nodeID[key] = val\n  return nodeID\n\ndef getEndpointID(endpoint):\n
+    \ return getidEndpointID(getEndpointNodeID(endpoint), int(getEndpointPort(endpoint)),
+    int(getEndpointEndpoint(endpoint)), \"interface\")\n\n\ndef getEndpointIDString(endpoint):\n
+    \ epID = getEndpointID(endpoint)\n  return genEndpointIDString(epID)\n\n\ndef
+    getLink(name, namespace, spec):\n  return {\n      \"apiVersion\": \"infra.kuid.dev/v1alpha1\",\n
+    \     \"kind\": \"Link\",\n      \"metadata\": {\n          \"name\": name,\n
+    \         \"namespace\": namespace\n      },\n      \"spec\": spec,\n  }"
+  type: starlark
+status: {}

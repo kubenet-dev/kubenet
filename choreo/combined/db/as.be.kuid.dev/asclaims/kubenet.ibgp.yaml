@@ -1,0 +1,38 @@
+apiVersion: as.be.kuid.dev/v1alpha1
+kind: ASClaim
+metadata:
+  creationTimestamp: "2024-09-08T13:21:36Z"
+  managedFields:
+  - apiVersion: as.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:ownerReferences:
+          k:{"uid":"962f2030-c5e1-4ee7-b4d8-e88393938271"}: {}
+      f:spec:
+        f:id: {}
+        f:index: {}
+    manager: core.network.kubenet.dev.networkdesigns.networkdesign
+    operation: Apply
+    time: "2024-09-08T13:21:36Z"
+  name: kubenet.ibgp
+  namespace: default
+  ownerReferences:
+  - apiVersion: core.network.kubenet.dev/v1alpha1
+    controller: true
+    kind: NetworkDesign
+    name: kubenet
+    uid: 962f2030-c5e1-4ee7-b4d8-e88393938271
+  resourceVersion: "0"
+  uid: 730c51c1-9960-412f-8541-8f56c5143925
+spec:
+  id: 65535
+  index: kubenet
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:21:36Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready
+  id: 65535

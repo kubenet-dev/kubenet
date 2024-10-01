@@ -1,0 +1,30 @@
+apiVersion: ipam.be.kuid.dev/v1alpha1
+kind: IPIndex
+metadata:
+  creationTimestamp: "2024-09-08T13:10:06Z"
+  managedFields:
+  - apiVersion: ipam.be.kuid.dev/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        f:prefixes: {}
+    manager: inputfileloader
+    operation: Apply
+    time: "2024-09-08T13:10:06Z"
+  name: kubenet.default
+  namespace: default
+  resourceVersion: "0"
+  uid: 6d92b49d-fb4a-452d-b6ed-e2fcf31011be
+spec:
+  prefixes:
+  - prefix: 10.0.0.0/8
+  - prefix: 1000::/32
+  - prefix: 192.0.0.0/8
+  - prefix: 1192::/32
+status:
+  conditions:
+  - lastTransitionTime: "2024-09-08T13:10:06Z"
+    message: ""
+    reason: Ready
+    status: "True"
+    type: Ready
