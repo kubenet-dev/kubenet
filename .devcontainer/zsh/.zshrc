@@ -126,7 +126,6 @@ complete -o default -F __start_kubectl k
 #autoload -U +X compinit && compinit
 
 alias c=choreoctl 
-complete -o default -F __start_choreoctl c
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 eval "$(atuin init zsh)"

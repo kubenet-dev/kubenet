@@ -33,3 +33,5 @@ kind completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/C
 kubenetctl completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_kubenetctl"
 # choreoctl completions
 choreoctl completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_choreoctl"
+# add c alias to the completions
+sed -i 's/compdef _choreoctl choreoctl/compdef _choreoctl choreoctl c/g' /home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_choreoctl
