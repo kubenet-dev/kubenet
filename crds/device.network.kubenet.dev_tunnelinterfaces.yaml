@@ -4,16 +4,16 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.15.0
-  name: interfaces.device.network.kubenet.dev
+  name: tunnelinterfaces.device.network.kubenet.dev
 spec:
   group: device.network.kubenet.dev
   names:
     categories:
     - kubenet
-    kind: Interface
-    listKind: InterfaceList
-    plural: interfaces
-    singular: interface
+    kind: TunnelInterface
+    listKind: TunnelInterfaceList
+    plural: tunnelinterfaces
+    singular: tunnelinterface
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -23,7 +23,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Interface defines the Schema for the Interface API
+        description: TunnelInterface defines the Schema for the TunnelInterface API
         properties:
           apiVersion:
             description: |-
@@ -43,37 +43,8 @@ spec:
           metadata:
             type: object
           spec:
-            description: InterfaceSpec defines the desired state of Interface
+            description: TunnelTunnelInterfaceSpec defines the desired state of TunnelInterface
             properties:
-              adaptor:
-                description: Adaptor defines the name of the adaptor
-                type: string
-              endpoint:
-                description: Endpoint defines the name of the endpoint
-                type: integer
-              ethernet:
-                description: Ethernet defines the ethernet properties of the interface
-                properties:
-                  speed:
-                    description: Speed defines the interface speed of the interface
-                    type: string
-                type: object
-              module:
-                description: Module defines the module reference id
-                type: integer
-              moduleBay:
-                description: ModuleBay defines the moduleBay reference id
-                type: integer
-              mtu:
-                default: 1514
-                description: |-
-                  MTU defines the max transmission unit size in octets for the physical interface.  If this is not set, the mtu is
-                  set to the operational default -- e.g., 1514 bytes on an Ethernet interface.";
-                format: int32
-                type: integer
-              name:
-                description: Name is used to refer to internal names of the node
-                type: string
               node:
                 description: Node defines the name of the node
                 type: string
@@ -81,29 +52,20 @@ spec:
                 description: Partition defines the partition this resource belongs
                   to
                 type: string
-              port:
-                description: Port defines the id of the port
-                type: integer
               region:
                 description: Region defines the region of the resource
                 type: string
               site:
                 description: Site defines the site of the resource
                 type: string
-              vlanTagging:
-                description: VLANTagging defines if the interface is configured for
-                  VLAN tagging
-                type: boolean
             required:
-            - endpoint
             - node
             - partition
-            - port
             - region
             - site
             type: object
           status:
-            description: InterfaceStatus defines the observed state of Interface
+            description: TunnelInterfaceStatus defines the observed state of TunnelInterface
             properties:
               conditions:
                 description: Conditions of the resource.

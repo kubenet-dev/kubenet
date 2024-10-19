@@ -31,6 +31,15 @@ type InterfaceSpec struct {
 	Ethernet *InterfaceSpecEthernet `json:"ethernet,omitempty" protobuf:"bytes,2,opt,name=ethernet"`
 	// VLANTagging defines if the interface is configured for VLAN tagging
 	VLANTagging *bool `json:"vlanTagging,omitempty" protobuf:"bytes,3,opt,name=vlanTagging"`
+	// MTU defines the max transmission unit size in octets for the physical interface.  If this is not set, the mtu is
+	// set to the operational default -- e.g., 1514 bytes on an Ethernet interface.";
+	// +kubebuilder:default:=1514
+	MTU uint32 `json:"mtu,omitempty" protobuf:"bytes,4,opt,name=mtu"`
+
+	//TBD
+	// Loopback 
+	// HoldUp - msec
+	// HoldDown - msec
 }
 
 type InterfaceSpecEthernet struct {
