@@ -64,4 +64,5 @@ RUN mkdir -p /home/vscode/.docker && echo "{}" > /home/vscode/.docker/config.jso
 COPY ./.devcontainer/zsh/.zshrc /home/vscode/.zshrc
 COPY ./.devcontainer/zsh/.p10k.zsh /home/vscode/.p10k.zsh
 COPY ./.devcontainer/zsh/install-zsh-plugins.sh /tmp/install-zsh-plugins.sh
-RUN bash -c "/tmp/install-zsh-plugins.sh"
+COPY ./.devcontainer/bash/install_bash_autocompletion.sh /tmp/install_bash_autocompletion.sh
+RUN bash -c "/tmp/install-zsh-plugins.sh ; /tmp/install_bash_autocompletion.sh"
