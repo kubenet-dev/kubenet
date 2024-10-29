@@ -42,5 +42,5 @@
         }
     },
     "workspaceMount": "source=${localWorkspaceFolder},target=/${containerWorkspaceFolder},type=bind",
-    "workspaceFolder": "/clab"
+    "workspaceFolder": "/kubenet"
 }

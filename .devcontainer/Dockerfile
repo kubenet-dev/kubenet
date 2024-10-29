@@ -44,6 +44,10 @@ RUN mkdir -p /root/.docker && echo "{}" > /root/.docker/config.json
 # maintain SSH_AUTH_SOCK env var when using sudo
 RUN mkdir -p /etc/sudoers.d && echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/ssh_auth_sock
 
+COPY ./.devcontainer/bash/install_bash_autocompletion.sh /tmp/install_bash_autocompletion.sh
+RUN bash -c "/tmp/install_bash_autocompletion.sh"
+RUN usermod -s /bin/zsh vscode
+
 # vscode user is created in the MS devcontainer image
 USER vscode
 
@@ -64,4 +68,4 @@ RUN mkdir -p /home/vscode/.docker && echo "{}" > /home/vscode/.docker/config.jso
 COPY ./.devcontainer/zsh/.zshrc /home/vscode/.zshrc
 COPY ./.devcontainer/zsh/.p10k.zsh /home/vscode/.p10k.zsh
 COPY ./.devcontainer/zsh/install-zsh-plugins.sh /tmp/install-zsh-plugins.sh
-RUN bash -c "/tmp/install-zsh-plugins.sh"
+RUN bash -c "/tmp/install-zsh-plugins.sh "

@@ -9,6 +9,9 @@ git clone --depth 1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$
 git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete
 
+git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
 # syntax highlighting
 git clone --depth 1 https://github.com/z-shell/F-Sy-H.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/F-Sy-H
 
@@ -16,18 +19,20 @@ git clone --depth 1 https://github.com/z-shell/F-Sy-H.git ${ZSH_CUSTOM:-$HOME/.o
 ### Shell completions
 ###
 # generate containerlab completions
-containerlab completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_containerlab"
+containerlab completion zsh > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_containerlab"
 # add clab alias to the completions
-sed -i 's/compdef _containerlab containerlab/compdef _containerlab containerlab clab/g' /home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_containerlab
+sed -i 's/compdef _containerlab containerlab/compdef _containerlab containerlab clab/g' ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_containerlab
 # generate gnmic completions
-gnmic completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_gnmic"
+gnmic completion zsh > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_gnmic"
 # generate gnoic completions
-gnoic completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_gnoic"
+gnoic completion zsh > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_gnoic"
 # generate gh completions
-gh completion -s zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_gh"
+gh completion -s zsh > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_gh"
 # kubectl completions
-kubectl completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_kubectl"
+kubectl completion zsh > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_kubectl"
 # kind completions
-kind completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_kind"
+kind completion zsh > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_kind"
 # kubenetctl completions
-kubenetctl completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_kubenetctl"
+kubenetctl completion zsh > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_kubenetctl"
+# choreoctl completions
+choreoctl completion zsh > "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete/Completions/_choreoctl"

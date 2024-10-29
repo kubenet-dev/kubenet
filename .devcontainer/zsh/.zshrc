@@ -92,7 +92,7 @@ zstyle ':completion:*'  list-colors '=*=97'
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(brew git pip python F-Sy-H zsh-autocomplete zsh-autosuggestions colored-man-pages kubectl)
+plugins=(brew git pip python F-Sy-H colored-man-pages zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)
 
 source $ZSH/oh-my-zsh.sh
 
