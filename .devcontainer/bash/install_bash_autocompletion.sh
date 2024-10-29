@@ -19,3 +19,5 @@ kubectl completion bash > "/usr/share/bash-completion/completions/kubectl"
 kind completion bash > "/usr/share/bash-completion/completions/kind"
 # kubenetctl completions
 kubenetctl completion bash > "/usr/share/bash-completion/completions/kubenetctl"
+# choreoctl completions
+choreoctl completion bash > "/usr/share/bash-completion/completions/choreoctl"
