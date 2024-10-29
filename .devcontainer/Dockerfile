@@ -46,6 +46,7 @@ RUN mkdir -p /etc/sudoers.d && echo 'Defaults env_keep += "SSH_AUTH_SOCK"' > /et
 
 COPY ./.devcontainer/bash/install_bash_autocompletion.sh /tmp/install_bash_autocompletion.sh
 RUN bash -c "/tmp/install_bash_autocompletion.sh"
+RUN usermod -s /bin/zsh vscode
 
 # vscode user is created in the MS devcontainer image
 USER vscode
