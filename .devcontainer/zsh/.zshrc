@@ -96,6 +96,9 @@ plugins=(brew git pip python F-Sy-H colored-man-pages zsh-autosuggestions zsh-sy
 
 source $ZSH/oh-my-zsh.sh
 
+bindkey              '^I' menu-select
+bindkey "$terminfo[kcbt]" menu-select
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
