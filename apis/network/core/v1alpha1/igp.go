@@ -83,10 +83,3 @@ type ISISLinkParameters struct {
 	// +optional
 	Level *ISISLevel `json:"area,omitempty" yaml:"area,omitempty" protobuf:"bytes,2,opt,name=area"`
 }
-
-type BGPLinkParameters struct {
-	// BFD defines if BFD is enabled for the EGP on this interface
-	// +kubebuilder:default:=true
-	// +optional
-	BFD *bool `json:"bfd,omitempty" yaml:"bfd,omitempty" protobuf:"bytes,1,opt,name=bfd"`
-}
