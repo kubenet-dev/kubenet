@@ -58,8 +58,8 @@ USER vscode
 # after `make build` is executed
 # COPY ./.devcontainer/dclab /usr/local/bin/dclab
 
-RUN docker pull ghcr.io/sdcio/config-server:v0.0.36
-RUN docker pull ghcr.io/sdcio/data-server:v0.0.44
+RUN docker pull ghcr.io/sdcio/config-server:v0.0.41
+RUN docker pull ghcr.io/sdcio/data-server:v0.0.48
 RUN docker pull ghcr.io/nokia/srlinux:24.7.2
 
 # create ssh key for vscode user to enable passwordless ssh to devices
