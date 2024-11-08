@@ -18,6 +18,7 @@ RUN apt update && apt install -y --no-install-recommends direnv \
     iproute2 \
     qemu-kvm \
     dnsutils \
+    bat \
     telnet
 
 # install kubectl
