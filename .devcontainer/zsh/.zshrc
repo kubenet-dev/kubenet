@@ -96,8 +96,8 @@ plugins=(brew git pip python F-Sy-H colored-man-pages zsh-autosuggestions zsh-sy
 
 source $ZSH/oh-my-zsh.sh
 
-bindkey              '^I' menu-select
-bindkey "$terminfo[kcbt]" menu-select
+bindkey -M menuselect              '^I'         menu-complete
+bindkey -M menuselect "$terminfo[kcbt]" reverse-menu-complete
 
 # User configuration
 
