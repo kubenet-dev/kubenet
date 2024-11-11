@@ -18,6 +18,7 @@ RUN apt update && apt install -y --no-install-recommends direnv \
     iproute2 \
     qemu-kvm \
     dnsutils \
+    skopeo \
     bat \
     telnet
 
@@ -52,16 +53,18 @@ COPY ./.devcontainer/bash/install_bash_autocompletion.sh /tmp/install_bash_autoc
 RUN bash -c "/tmp/install_bash_autocompletion.sh"
 RUN usermod -s /bin/zsh vscode
 
+RUN apt install -y docker 
+
+RUN skopeo copy docker://ghcr.io/sdcio/config-server:v0.0.41 docker-archive:/var/cache/config-server.tar:ghcr.io/sdcio/config-server:v0.0.41
+RUN skopeo copy docker://ghcr.io/sdcio/data-server:v0.0.48 docker-archive:/var/cache/data-server.tar:ghcr.io/sdcio/data-server:v0.0.48
+RUN skopeo copy docker://ghcr.io/nokia/srlinux:24.7.2 docker-archive:/var/cache/srlinux.tar:ghcr.io/nokia/srlinux:24.7.2
+
 # vscode user is created in the MS devcontainer image
 USER vscode
 
 # copy dclab script that is used to run the local containerlab build
 # after `make build` is executed
 # COPY ./.devcontainer/dclab /usr/local/bin/dclab
-
-RUN docker pull ghcr.io/sdcio/config-server:v0.0.41
-RUN docker pull ghcr.io/sdcio/data-server:v0.0.48
-RUN docker pull ghcr.io/nokia/srlinux:24.7.2
 
 # create ssh key for vscode user to enable passwordless ssh to devices
 RUN ssh-keygen -t ecdsa -b 256 -N "" -f ~/.ssh/id_ecdsa
