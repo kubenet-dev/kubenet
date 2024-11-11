@@ -26,7 +26,7 @@ RUN apt update && apt install -y --no-install-recommends direnv \
 RUN bash -c "curl -LO 'https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl'" && chmod +x kubectl && mv kubectl /usr/local/bin/
 
 # install kind
-RUN bash -c "$(curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64)" && chmod +x kind && mv kind /usr/local/bin/
+RUN bash -c "$(curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.25.0/kind-linux-amd64)" && chmod +x kind && mv kind /usr/local/bin/
 
 # install k9s
 RUN bash -c "curl -L  https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_amd64.tar.gz | tar xz -C /bin"
@@ -56,6 +56,7 @@ RUN usermod -s /bin/zsh vscode
 RUN skopeo copy docker://ghcr.io/sdcio/config-server:v0.0.41 docker-archive:/var/cache/config-server.tar:ghcr.io/sdcio/config-server:v0.0.41
 RUN skopeo copy docker://ghcr.io/sdcio/data-server:v0.0.48 docker-archive:/var/cache/data-server.tar:ghcr.io/sdcio/data-server:v0.0.48
 RUN skopeo copy docker://ghcr.io/nokia/srlinux:24.7.2 docker-archive:/var/cache/srlinux.tar:ghcr.io/nokia/srlinux:24.7.2
+RUN skopeo copy docker://kindest/node:v1.31.2 docker-archive:/var/cache/kindest-node.tar:kindest/node:v1.31.2
 
 # vscode user is created in the MS devcontainer image
 USER vscode

@@ -96,9 +96,6 @@ plugins=(brew git pip python F-Sy-H colored-man-pages zsh-autosuggestions zsh-sy
 
 source $ZSH/oh-my-zsh.sh
 
-bindkey -M menuselect              '^I'         menu-complete
-bindkey -M menuselect "$terminfo[kcbt]" reverse-menu-complete
-
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -135,3 +132,6 @@ eval "$(atuin init zsh)"
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+
+bindkey -M menuselect              '^I'         menu-complete
+bindkey -M menuselect "$terminfo[kcbt]" reverse-menu-complete

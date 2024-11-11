@@ -36,3 +36,7 @@ kind completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/C
 kubenetctl completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_kubenetctl"
 # choreoctl completions
 choreoctl completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_choreoctl"
+# docker completions
+docker completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_docker"
+# k9s completions
+k9s completion zsh > "/home/vscode/.oh-my-zsh/custom/plugins/zsh-autocomplete/Completions/_k9s"

@@ -21,3 +21,7 @@ kind completion bash > "/usr/share/bash-completion/completions/kind"
 kubenetctl completion bash > "/usr/share/bash-completion/completions/kubenetctl"
 # choreoctl completions
 choreoctl completion bash > "/usr/share/bash-completion/completions/choreoctl"
+# docker completions
+docker completion bash > "/usr/share/bash-completion/completions/docker"
+# k9s completions
+k9s completion bash > "/usr/share/bash-completion/completions/k9s"
