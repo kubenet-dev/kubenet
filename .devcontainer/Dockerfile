@@ -54,7 +54,7 @@ RUN bash -c "/tmp/install_bash_autocompletion.sh"
 RUN usermod -s /bin/zsh vscode
 
 RUN skopeo copy docker://ghcr.io/sdcio/config-server:v0.0.41 docker-archive:/var/cache/config-server.tar:ghcr.io/sdcio/config-server:v0.0.41
-RUN skopeo copy docker://ghcr.io/sdcio/data-server:v0.0.48 docker-archive:/var/cache/data-server.tar:ghcr.io/sdcio/data-server:v0.0.48
+RUN skopeo copy docker://ghcr.io/sdcio/data-server:v0.0.49 docker-archive:/var/cache/data-server.tar:ghcr.io/sdcio/data-server:v0.0.49
 RUN skopeo copy docker://ghcr.io/nokia/srlinux:24.7.2 docker-archive:/var/cache/srlinux.tar:ghcr.io/nokia/srlinux:24.7.2
 RUN skopeo copy docker://kindest/node:v1.31.2 docker-archive:/var/cache/kindest-node.tar:kindest/node:v1.31.2
 
